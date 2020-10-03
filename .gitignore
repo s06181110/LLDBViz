@@ -1,3 +1,7 @@
+# start [C ignores]
+a.out*
+# end [C ignores]
+
 # start [Flask template]
 .DS_Store
 .env
