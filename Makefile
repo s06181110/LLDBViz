@@ -3,7 +3,7 @@ PYDOC	= pydoc
 PYCS	= $(shell find . -name "*.pyc")
 BASE	= Example
 EXT		= py
-FLASK_APP = flask/hello.py
+FLASK_APP = backend/hello.py
 FLASK_ENV = development
 WORKDIR	= ./
 PYLINT	= pylint
@@ -22,7 +22,7 @@ clean:
 wipe: clean
 	@find . -name ".DS_Store" -exec rm {} ";" -exec echo rm -f {} ";"
 
-test: all virtual
+test: all
 	# (cd target; clang -g -O0 main.c)
 	export FLASK_APP=$(FLASK_APP) \
 	export FLASK_ENV=$(FLASK_ENV) \
@@ -31,7 +31,7 @@ test: all virtual
 
 lint: pylint clean
 	@if [ ! -e $(LINTRCF) ] ; then $(PYLINT) --generate-rcfile > $(LINTRCF)  ; fi
-	$(PYLINT) --rcfile=$(LINTRCF) `find ./flask -name "*.py"` > $(LINTRST) ; less $(LINTRST)
+	$(PYLINT) --rcfile=$(LINTRCF) `find ./backend -name "*.py"` > $(LINTRST) ; less $(LINTRST)
 
 # 
 # pip is the PyPA recommended tool for installing Python packages.
@@ -60,15 +60,6 @@ flask:
 	@if [ -z `pip list --format=freeze | grep Flask` ]; \
 	then \
 		(cd $(WORKDIR); pip install Flask); \
-	fi
-#
-# make a virtual env for flask
-# using python built in xcode
-#
-virtual:
-	@if ! [ -d "venv" ]; \
-	then \
-		xcrun $(PYTHON) -m venv venv; \
 	fi
 
 # 
