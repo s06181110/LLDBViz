@@ -3,18 +3,26 @@
 ## スタックメモリの可視化
 
 
-### Quickstart
+## Quickstart
+### Install
 ```bash
 $ git clone https://github.com/s06181110/memoryVisualization
 $ cd memoryVisualization
-# XcodeのPythonを使うため xcrun で環境構築
+```
+### Create an environment with Python in Xcode 
+```bash
 $ xcrun python3 -m venv venv
-# activate virtual environment
+```
+### Activate virtual environment
+```bash
 # When you want to end "deactivate"
 $ . venv/bin/activate
-# get some library
+```
+### Get some library
+```bash
 $ make prepare
-# launch
+```
+### Launch
+```bash
 $ make test
 ```
-
