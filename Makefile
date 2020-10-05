@@ -22,12 +22,14 @@ clean:
 wipe: clean
 	@find . -name ".DS_Store" -exec rm {} ";" -exec echo rm -f {} ";"
 
-test: all
-	# (cd target; clang -g -O0 main.c)
+test: all target
 	export FLASK_APP=$(FLASK_APP) \
 	export FLASK_ENV=$(FLASK_ENV) \
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) -m flask run
+
+target: target/main.c
+	(cd target; clang -g -O0 main.c)
 
 lint: pylint clean
 	@if [ ! -e $(LINTRCF) ] ; then $(PYLINT) --generate-rcfile > $(LINTRCF)  ; fi
