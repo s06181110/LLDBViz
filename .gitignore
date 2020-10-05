@@ -1,8 +1,8 @@
-# start [C ignores]
+# start [C]
 a.out*
-# end [C ignores]
+# end [C]
 
-# start [Flask template]
+# start [Flask]
 .DS_Store
 .env
 .flaskenv
@@ -30,4 +30,4 @@ htmlcov/
 
 ## myenv for flask
 venv/
-# end [Flask template]
+# end [Flask]
