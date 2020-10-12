@@ -50,8 +50,8 @@ class LLDBObject:
 
     def show_breakpoints(self):
         """ print some breakpoints """
-        for breakpoint in self._target.breakpoint_iter():
-                print(breakpoint)
+        for a_breakpoint in self._target.breakpoint_iter():
+            print(a_breakpoint)
 
     def launch(self, argv=None, envp=None):
         """ Launch LLDB """
