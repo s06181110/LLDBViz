@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" 
+"""
 Class that manages LLDB information
 """
 
@@ -9,9 +9,9 @@ __author__ = 'Enomoto Yoshiki'
 __version__ = '1.0.0'
 __date__ = '2020/10/12 (Created: 2020/10/12)'
 
+import os
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
-import os
 
 class LLDBObject:
     """

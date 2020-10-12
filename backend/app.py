@@ -5,11 +5,8 @@
 Flask Test
 """
 
-import os
-# pylint: disable=E0401
-import lldb  # export PYTHONPATH=`lldb -P`
 from flask import Flask
-from backend.lldb_object import LLDBObject
+from lldb_object import LLDBObject
 
 app = Flask(__name__)
 
