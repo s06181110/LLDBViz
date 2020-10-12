@@ -48,6 +48,11 @@ class LLDBObject:
         """ Set a breakpoint """
         self._target.BreakpointCreateByLocation("main.c", line)
 
+    def show_breakpoints(self):
+        """ print some breakpoints """
+        for breakpoint in self._target.breakpoint_iter():
+                print(breakpoint)
+
     def launch(self, argv=None, envp=None):
         """ Launch LLDB """
         self._process = self._target.LaunchSimple(argv, envp, os.getcwd())
