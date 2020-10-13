@@ -34,4 +34,8 @@ def get_stack_memory():
 
     return LLDB.get_stack_memory()
 
+@app.route('/process/<string:process>')
+def debug_process(process):
+    """ debugger process """
+    LLDB.debug_process(process)
     return LLDB.get_stack_memory()

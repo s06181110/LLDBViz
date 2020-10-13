@@ -10,6 +10,7 @@ __version__ = '1.0.0'
 __date__ = '2020/10/12 (Created: 2020/10/12)'
 
 import os
+import constants
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 
@@ -78,6 +79,22 @@ class LLDBObject:
                 'fp': self._frame.GetFP(),
                 'sp': self._frame.GetSP(),
             }
+
+    def debug_process(self, process):
+        """ debugger step into """
+        self.update_thread()
+        if not self._thread:
+            return
+        if process == constants.STEP_INTO:
+            self._thread.StepInto()
+        elif process == constants.STEP_OVER:
+            self._thread.StepOver()
+        elif process == constants.STEP_OUT:
+            self._thread.StepOut()
+        elif process == constants.CONTINUE:
+            self._process.Continue()
+        elif process == constants.STOP:
+            self._thread.Stop()
 
     def get_stack_memory(self, extent=0x20):
         " Get current stack memory"
