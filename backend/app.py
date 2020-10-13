@@ -31,5 +31,7 @@ def set_breakpoint(line):
 
 @app.route('/memory')
 def get_stack_memory():
-    " get current stack memory"
+
+    return LLDB.get_stack_memory()
+
     return LLDB.get_stack_memory()
