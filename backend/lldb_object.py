@@ -83,6 +83,8 @@ class LLDBObject:
         " Get current stack memory"
         self.update_addresses()
         stack_pointer = self._pointer['sp']
+        if self._pointer['sp'] == self._pointer['fp']:
+            stack_pointer -= extent
         stack_memory = self._process.ReadMemory(stack_pointer, extent, self._error_ref)
         memory_string = stack_memory.hex()
         output = ''
