@@ -1,17 +1,16 @@
 <template lang="pug">
-  v-app 
-    HelloWorld
-    v-card.red.lighten-4
-      v-card-title Hoge
+v-app 
+  v-main
+    MemoryTable
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import MemoryTable from './components/MemoryTable';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    MemoryTable,
   },
   data: () => ({
     //
