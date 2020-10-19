@@ -30,3 +30,16 @@ $ cd memoryVisualization
     ```bash
     $ make test
     ```
+
+- Frontend
+    ```bash
+    $ cd project_dir/frontend;
+    ```
+    ### Get some library
+    ```bash
+    $ npm install
+    ```
+    ### Launch
+    ```bash
+    $ npm run serve
+    ```
