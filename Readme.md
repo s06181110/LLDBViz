@@ -4,6 +4,12 @@
 
 
 ## Quickstart
+
+### Requirements
+- Mac OS
+- Xcode
+- Node.js
+
 ### Install
 ```bash
 $ git clone https://github.com/s06181110/memoryVisualization
