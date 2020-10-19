@@ -3,7 +3,7 @@ PYDOC	= pydoc
 PYCS	= $(shell find . -name "*.pyc")
 BASE	= Example
 EXT		= py
-FLASK_APP = backend/app.py
+FLASK_APP = src/app.py
 FLASK_ENV = development
 WORKDIR	= ./
 PYLINT	= pylint
@@ -33,7 +33,7 @@ target: target/main.c
 
 lint: pylint clean
 	@if [ ! -e $(LINTRCF) ] ; then $(PYLINT) --generate-rcfile > $(LINTRCF)  ; fi
-	$(PYLINT) --rcfile=$(LINTRCF) `find ./backend -name "*.py"` > $(LINTRST) ; less $(LINTRST)
+	$(PYLINT) --rcfile=$(LINTRCF) `find ./src -name "*.py"` > $(LINTRST) ; less $(LINTRST)
 
 # 
 # pip is the PyPA recommended tool for installing Python packages.
