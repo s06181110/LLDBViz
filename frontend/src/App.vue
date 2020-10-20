@@ -1,5 +1,5 @@
 <template lang="pug">
-v-app 
+v-app
   v-main
     MemoryTable
 </template>
