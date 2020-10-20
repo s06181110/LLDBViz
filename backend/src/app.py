@@ -39,3 +39,19 @@ def debug_process(process):
     """ debugger process """
     LLDB.debug_process(process)
     return LLDB.get_stack_memory()
+
+def test():
+    """
+    simple test
+    this method called by main (is not related to serve)
+
+    ex)
+    set_breakpoint(11)
+    launch_lldb()
+    print(debug_process('STEP_INTO'))
+    print(debug_process('STOP'))
+    """
+    
+
+if __name__ == "__main__":
+    test()
