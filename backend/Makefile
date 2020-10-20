@@ -28,6 +28,10 @@ test: all target
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) -m flask run
 
+check: target
+	export PYTHONPATH=`lldb -P`; \
+	$(PYTHON) $(FLASK_APP)
+
 target: target/main.c
 	(cd target; clang -g -O0 main.c)
 
