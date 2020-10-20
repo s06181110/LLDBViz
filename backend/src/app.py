@@ -23,11 +23,12 @@ def launch_lldb():
     LLDB.launch()
     return "launch"
 
-@app.route('/breakpoint/<int:line>')
-def set_breakpoint(line):
+@app.route('/breakpoints', methods=['POST'])
+def breakpoint():
     """ set a breakpoint """
-    LLDB.set_breakpoint(line)
-    return 'ok'
+    lines = request.json
+    breakpoints = LLDB.set_breakpoint(lines)
+    return breakpoints
 
 @app.route('/memory')
 def get_stack_memory():
