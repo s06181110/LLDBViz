@@ -94,10 +94,13 @@ class LLDBObject:
         elif process == constants.CONTINUE:
             self._process.Continue()
         elif process == constants.STOP:
-            self._thread.Stop()
+            self._process.Destroy()
+            self._process = None
 
     def get_stack_memory(self, extent=0x20):
         " Get current stack memory"
+        if not self._process:
+            return 'None'
         self.update_addresses()
         stack_pointer = self._pointer['sp']
         if self._pointer['sp'] == self._pointer['fp']:
