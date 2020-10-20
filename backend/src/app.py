@@ -5,7 +5,7 @@
 Flask Test
 """
 
-from flask import Flask
+from flask import Flask, request
 from lldb_object import LLDBObject
 
 app = Flask(__name__)
