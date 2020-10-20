@@ -17,7 +17,7 @@ def hello_world():
     """ hello world """
     return 'Hello, World!'
 
-@app.route('/lldb')
+@app.route('/launch')
 def launch_lldb():
     """ create lldb """
     LLDB.launch()
