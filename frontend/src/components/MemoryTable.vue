@@ -17,7 +17,7 @@ v-container
             v-btn( @click="fetchMemory('STEP_INTO')" icon small )
               v-icon mdi-debug-step-into
           v-col.col-3
-            v-btn( @click="fetchMemory('fetchMemory')" icon small )
+            v-btn( @click="fetchMemory('STEP_OUT')" icon small )
               v-icon mdi-debug-step-out
   v-card.mx-auto.mt-10( max-width="600" )
     v-card-title Variables
