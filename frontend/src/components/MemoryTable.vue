@@ -20,6 +20,13 @@ v-container
             v-btn( @click="fetchMemory('fetchMemory')" icon small )
               v-icon mdi-debug-step-out
   v-card.mx-auto.mt-10( max-width="600" )
+    v-card-title Variables
+    v-card-text
+      v-container
+        v-row
+          v-col.col-12
+            p(v-text="variables" style="white-space:pre-wrap; word-wrap:break-word;")
+  v-card.mx-auto.mt-10( max-width="600" )
     v-card-title Debugger
     v-card-text
       v-container.align-center
@@ -43,7 +50,8 @@ v-container
 export default {
   name: 'App',
   data: () => ({
-    memory: "None",
+    memory: 'None',
+    variables: 'None',
     breakpoints: {
       show: false,
       text: '',
@@ -55,6 +63,12 @@ export default {
     fetchMemory (type) {
       this.$axios.get(`/api/process/${type}`).then(res => {
         this.memory = res.data;
+      }).catch(e => console.error(e));
+      this.fetchVariables();
+    },
+    fetchVariables () {
+      this.$axios.get(`/api/variables`).then(res => {
+        this.variables = res.data;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
