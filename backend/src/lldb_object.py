@@ -115,3 +115,11 @@ class LLDBObject:
             output += "{}: {}\n".format(hex(stack_pointer+int(four_byte/2)), formatted_byte)
 
         return output
+
+    def get_variables(self):
+        """ Get Valiables """
+        self.update_frame()
+        output = ''
+        for var in self._frame.GetVariables(True, True, True, False):
+            output += "{}: {}\n".format(var.GetAddress(), str(var))
+        return output
