@@ -8,16 +8,16 @@ v-container
           v-col.col-12
             p(v-text="memory" style="white-space:pre-wrap; word-wrap:break-word;")
           v-col.col-3
-            v-btn( @click="fetchMemory('CONTINUE')" icon small )
+            v-btn( @click="doProcess('CONTINUE')" icon small )
               v-icon mdi-step-forward
           v-col.col-3
-            v-btn( @click="fetchMemory('STEP_OVER')" icon small )
+            v-btn( @click="doProcess('STEP_OVER')" icon small )
               v-icon mdi-debug-step-over 
           v-col.col-3
-            v-btn( @click="fetchMemory('STEP_INTO')" icon small )
+            v-btn( @click="doProcess('STEP_INTO')" icon small )
               v-icon mdi-debug-step-into
           v-col.col-3
-            v-btn( @click="fetchMemory('STEP_OUT')" icon small )
+            v-btn( @click="doProcess('STEP_OUT')" icon small )
               v-icon mdi-debug-step-out
   v-card.mx-auto.mt-10( max-width="600" )
     v-card-title Debugger
@@ -43,20 +43,18 @@ v-container
 export default {
   name: 'App',
   data: () => ({
-    memory: 'None',
     breakpoints: {
       show: true,
       text: '',
     },
     breakpointLines: [13],
     status: 'stop',
+    table: {},
   }),
   methods: {
-    fetchMemory (type) {
+    doProcess (type) {
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.memory = res.data;
-      }).catch(e => console.error(e));
-    },
+        this.table = res.data;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
@@ -70,16 +68,14 @@ export default {
       this.$axios.get('/api/launch').then(res => {
         if (res.status === 200) {
           this.status = 'launch';
-          this.fetchMemory();
+          this.table = res.data;
         }
       });
-      console.log('launch');
     },
     stopLLDB () {
       this.$axios.get('/api/process/STOP').then(res => {
         if (res.status === 200) {
           this.status = 'stop';
-          this.fetchMemory();
         }
       });
     }
