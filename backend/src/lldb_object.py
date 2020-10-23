@@ -11,6 +11,7 @@ __date__ = '2020/10/12 (Created: 2020/10/12)'
 
 import os
 import constants
+from memory_table import MemoryTable
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 
@@ -44,6 +45,7 @@ class LLDBObject(object):
         self._frame = None
         self._function = None
         self._pointer = { 'fp': None, 'sp': None}
+        self._table = MemoryTable()
 
     def set_breakpoint(self, lines):
         """ Set a breakpoint """
@@ -96,6 +98,7 @@ class LLDBObject(object):
         elif process == constants.STOP:
             self._process.Destroy()
             self._process = None
+            self._table = MemoryTable()
 
     def get_stack_memory(self, extent=0x20):
         " Get current stack memory"
