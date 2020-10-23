@@ -14,7 +14,7 @@ import constants
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 
-class LLDBObject:
+class LLDBObject(object):
     """
     Class that manages LLDB information
     LLDB structure:
