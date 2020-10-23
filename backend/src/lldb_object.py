@@ -121,8 +121,8 @@ class LLDBObject:
         stack_pointer = self._pointer['sp']
         if self._pointer['sp'] == self._pointer['fp']:
             stack_pointer -= extent
-        stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
-        memory_string = stack_memory.hex()
+        # stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
+        # memory_string = stack_memory.hex()
 
         read_memory = (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR))
         self._table.set_variables(self._frame.GetVariables(True, True, True, False), read_memory)
