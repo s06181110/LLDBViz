@@ -30,11 +30,6 @@ def breakpoint():
     breakpoints = LLDB.set_breakpoint(lines)
     return breakpoints
 
-@app.route('/variables')
-def get_variables():
-
-    return LLDB.get_variables()
-
 @app.route('/process/<string:process>')
 def debug_process(process):
     """ debugger process """
