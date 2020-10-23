@@ -6,7 +6,10 @@ v-container
       v-container
         v-row
           v-col.col-12
-            p(v-text="memory" style="white-space:pre-wrap; word-wrap:break-word;")
+            template(v-if="table.length > 0" )
+              template(v-for="value in table")
+                p.my-15.py-15(:id="value.address") 
+                  a(:href="'#' + valueToAddress(value.data)") {{ value.data }}
           v-col.col-3
             v-btn( @click="doProcess('CONTINUE')" icon small )
               v-icon mdi-step-forward
@@ -78,7 +81,11 @@ export default {
           this.status = 'stop';
         }
       });
-    }
+    },
+    valueToAddress(value) {
+      const addr = value.split(' ').slice(-1);
+      return '0x' + parseInt(addr, 16).toString(16); // 0x00ff -> 0xff
+    },
   }
 };
 </script>
