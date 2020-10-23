@@ -13,11 +13,6 @@ class MemoryTable:
     """
     Memory TableClass
     """
-    @staticmethod
-    def __new__(cls):
-        """ Instance generation method """
-        self = super().__new__(cls)
-        return self
 
     def __init__(self):
         self._table = []

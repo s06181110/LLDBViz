@@ -25,12 +25,6 @@ class LLDBObject:
     EXE = os.path.join(os.getcwd(), 'target', 'a.out')
     ERROR = lldb.SBError()
 
-    @staticmethod
-    def __new__(cls):
-        """ Instance generation method """
-        self = super().__new__(cls)
-        return self
-
     def __init__(self):
         """ Instance initialization method """
         super().__init__()
