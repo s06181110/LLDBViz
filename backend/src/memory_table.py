@@ -23,8 +23,9 @@ class MemoryTable:
         return self
 
     def __init__(self):
+        super().__new__(self)
         self._table = []
-    
+
     def get_table(self):
         return self._table
 
@@ -56,10 +57,10 @@ class MemoryTable:
                 return index
             index = index + 1
         return None
-    
+
 
     def format_raw(self, raw):
-        """ 
+        """
         format memory raw string
         ex)
         c8010000 -> 000001c8
