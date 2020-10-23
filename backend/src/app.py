@@ -24,7 +24,7 @@ def launch_lldb():
     return jsonify(LLDB.get_memory_table())
 
 @app.route('/breakpoints', methods=['POST'])
-def breakpoint():
+def set_breakpoint():
     """ set a breakpoint """
     lines = request.json
     breakpoints = LLDB.set_breakpoint(lines)

@@ -30,7 +30,7 @@ class MemoryTable:
         """ get a table """
         return self._table
 
-    def set_variables(self, vars, read_memory):
+    def set_variables(self, variables, read_memory):
         """
         Parameters
         ----------
@@ -39,11 +39,11 @@ class MemoryTable:
         read_memory: lambda (addr, size) -> str
             get memory in binary
         """
-        for var in vars:
+        for a_variable in variables:
             table = dict(
-                address = str(var.GetAddress()),
-                data = str(var),
-                raw = self.format_raw(read_memory(int(str(var.GetAddress()), 16), var.GetByteSize()).hex()),
+                address = str(a_variable.GetAddress()),
+                data = str(a_variable),
+                raw = self.format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
             )
             table_index = self.index_of_table_by_address(table['address'])
             if table_index:
