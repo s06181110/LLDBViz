@@ -116,6 +116,21 @@ class LLDBObject(object):
 
         return output
 
+    def get_memory_table(self, extent=0x50):
+        " Get current stack memory"
+        if not self._process:
+            return 'None'
+        self.update_addresses()
+        stack_pointer = self._pointer['sp']
+        if self._pointer['sp'] == self._pointer['fp']:
+            stack_pointer -= extent
+        stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
+        memory_string = stack_memory.hex()
+    
+        read_memory = (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR))
+        self._table.set_variables(self._frame.GetVariables(True, True, True, False), read_memory)
+        return self._table.get_table()
+        
     def get_variables(self):
         """ Get Valiables """
         self.update_frame()
