@@ -45,10 +45,10 @@ export default {
   data: () => ({
     memory: 'None',
     breakpoints: {
-      show: false,
+      show: true,
       text: '',
     },
-    breakpointLines: [11],
+    breakpointLines: [13],
     status: 'stop',
   }),
   methods: {
@@ -62,6 +62,7 @@ export default {
     setBreakpoints () {
       this.$axios.post('/api/breakpoints', this.breakpointLines)
         .then(res => {
+          this.breakpoints.show = true;
           this.breakpoints.text = res.data;
         });
     },
