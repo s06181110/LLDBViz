@@ -23,7 +23,6 @@ class MemoryTable:
         return self
 
     def __init__(self):
-        super().__new__(self)
         self._table = []
 
     def get_table(self):
