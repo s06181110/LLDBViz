@@ -5,7 +5,7 @@
 Flask Test
 """
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from lldb_object import LLDBObject
 
 app = Flask(__name__)
@@ -21,7 +21,7 @@ def hello_world():
 def launch_lldb():
     """ create lldb """
     LLDB.launch()
-    return "launch"
+    return jsonify(LLDB.get_memory_table())
 
 @app.route('/breakpoints', methods=['POST'])
 def breakpoint():
@@ -39,7 +39,8 @@ def get_variables():
 def debug_process(process):
     """ debugger process """
     LLDB.debug_process(process)
-    return LLDB.get_stack_memory()
+    table = LLDB.get_memory_table()
+    return jsonify(table)
 
 def test():
     """
