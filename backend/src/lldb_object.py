@@ -10,10 +10,10 @@ __version__ = '1.0.0'
 __date__ = '2020/10/12 (Created: 2020/10/12)'
 
 import os
-import constants
-from memory_table import MemoryTable
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
+import constants
+from memory_table import MemoryTable
 
 class LLDBObject:
     """
