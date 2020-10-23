@@ -22,6 +22,7 @@ class LLDBObject(object):
     """
 
     EXE = os.path.join(os.getcwd(), 'target', 'a.out')
+    ERROR = lldb.SBError()
 
     @staticmethod
     def __new__(cls):
@@ -38,7 +39,6 @@ class LLDBObject(object):
         # stops. We do this by setting the async mode to false.
         self._debugger.SetAsync (False)
         self._target = self._debugger.CreateTarget(self.EXE)
-        self._error_ref = lldb.SBError()
         self._process = None
         self._thread = None
         self._frame = None
@@ -105,7 +105,7 @@ class LLDBObject(object):
         stack_pointer = self._pointer['sp']
         if self._pointer['sp'] == self._pointer['fp']:
             stack_pointer -= extent
-        stack_memory = self._process.ReadMemory(stack_pointer, extent, self._error_ref)
+        stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
         memory_string = stack_memory.hex()
         output = ''
         for four_byte in range(0, len(memory_string), 8):
