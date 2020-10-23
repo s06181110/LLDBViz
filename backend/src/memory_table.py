@@ -9,9 +9,6 @@ __author__ = 'Enomoto Yoshiki'
 __version__ = '1.0.0'
 __date__ = '2020/10/23 (Created: 2020/10/23)'
 
-from pprint import pprint
-import re
-
 class MemoryTable:
     """
     Memory TableClass
