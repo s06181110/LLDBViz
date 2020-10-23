@@ -42,7 +42,7 @@ class MemoryTable:
             table = dict(
                 address = str(a_variable.GetAddress()),
                 data = str(a_variable),
-                raw = self.format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
+                raw = format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
             )
             table_index = self.index_of_table_by_address(table['address'])
             if table_index:
@@ -62,13 +62,13 @@ class MemoryTable:
         return None
 
 
-    def format_raw(self, raw):
-        """
-        format memory raw string
-        ex)
-        c8010000 -> 000001c8
-        """
-        output = ''
-        for byte in range(0, len(raw), 2):
-            output = raw[byte:byte+2] + output
-        return output
+def format_raw(raw):
+    """
+    format memory raw string
+    ex)
+    c8010000 -> 000001c8
+    """
+    output = ''
+    for byte in range(0, len(raw), 2):
+        output = raw[byte:byte+2] + output
+    return output
