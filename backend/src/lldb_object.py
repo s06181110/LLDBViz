@@ -15,7 +15,7 @@ from memory_table import MemoryTable
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 
-class LLDBObject(object):
+class LLDBObject:
     """
     Class that manages LLDB information
     LLDB structure:
