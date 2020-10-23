@@ -27,6 +27,7 @@ class MemoryTable:
         self._table = []
 
     def get_table(self):
+        """ get a table """
         return self._table
 
     def set_variables(self, vars, read_memory):
@@ -51,6 +52,9 @@ class MemoryTable:
                 self._table.append(table)
 
     def index_of_table_by_address(self, addr):
+        """
+        get index of table by address
+        """
         index = 0
         for var in self._table:
             if var['address'] == addr:
