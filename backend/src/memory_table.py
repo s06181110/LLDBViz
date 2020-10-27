@@ -9,6 +9,8 @@ __author__ = 'Enomoto Yoshiki'
 __version__ = '1.0.0'
 __date__ = '2020/10/23 (Created: 2020/10/23)'
 
+import re
+
 class MemoryTable:
     """
     Memory TableClass
@@ -33,8 +35,9 @@ class MemoryTable:
         for a_variable in variables:
             table = dict(
                 address = str(a_variable.GetAddress()),
-                data = str(a_variable),
+                data = str(a_variable).split(')')[1],
                 raw = format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
+                type = get_type(str(a_variable)),
             )
             table_index = self.index_of_table_by_address(table['address'])
             if table_index:
@@ -64,3 +67,14 @@ def format_raw(raw):
     for byte in range(0, len(raw), 2):
         output = raw[byte:byte+2] + output
     return output
+
+def get_type(a_string):
+    """
+    get type by data string
+    ex)
+    (const char **) argv = 0x00007ffee6bb7510
+        -> const char **
+    """
+    result = re.match(r'\((.+)\)', a_string)
+    return result.group(1)
+
