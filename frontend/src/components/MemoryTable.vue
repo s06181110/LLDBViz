@@ -1,15 +1,16 @@
 <template lang="pug">
 v-container
   v-card.mx-auto.mt-10( max-width="600" )
-    v-card-title Memory Table
+    v-card-title Process
     v-card-text
       v-container
-        v-row
-          v-col.col-12
-            template(v-if="table.length > 0" )
-              template(v-for="value in table")
-                p.my-15.py-15(:id="value.address") 
-                  a(:href="'#' + valueToAddress(value.data)") {{ value.data }}
+        v-row.text-center
+          //
+            v-col.col-12
+              template(v-if="table.length > 0" )
+                template(v-for="value in table")
+                  p.my-15.py-15(:id="value.address") 
+                    a(:href="'#' + valueToAddress(value.data)") {{ value.data }}
           v-col.col-3
             v-btn( @click="doProcess('CONTINUE')" icon small )
               v-icon mdi-step-forward
@@ -39,7 +40,42 @@ v-container
               p {{ breakpoints.text }}
         v-row.justify-center
           v-btn.mr-8.red( dark @click="launchLLDB" ) launch
-          v-btn.blue-grey( dark @click="stopLLDB" ) stop
+          v-btn.blue-grey( dark @click="stopLLDB" href="#0x7ffee11324c4" ) stop
+  v-card.mx-auto.mt-10( max-width="600" )
+    v-card-title Stack Memory
+    v-card( elevation="16" class="mx-auto" max-width="500"  )
+      v-virtual-scroll( :items="table" :bench="table.length" item-height="64" max-height="100" ref="vScroll")
+          template( v-slot:default="{ item }" )
+            v-list-item.mb-2( :key="item.address" :id="item.address" )
+              v-list-item-content( style="width: 150px" )
+                v-list-item-title {{ item.address }}
+              v-divider.mx-4(vertical)
+              v-list-item-content
+                v-list-item-title {{ item.name }}
+              v-list-item-action
+                v-btn( icon depressed small @click="openInformation(item)" )
+                  v-icon mdi-information-outline
+            v-divider( v-if="item.address != table[table.length - 1].address")
+    v-dialog( v-model="dialog.show " width="500" v-if="dialog.show" )
+      v-card(style="white-space:pre-wrap;")
+        v-card-title information
+        v-card-text
+          p( v-text="`address: ${ dialog.item.address }`" )
+          p( v-text="`type: ${ dialog.item.type }`" )
+          p name: {{ dialog.item.name }}
+            template(v-if="isPointer(dialog.item.type)" )
+              | →
+              a(:href="`#${valueToAddress(dialog.item.data)}`" @click="dialog.show = false")  &{{ dialog.item.name }}
+          p data   : {{ dialog.item.data }}
+          p raw    : {{ dialog.item.raw }}
+      //
+        v-card-text(v-text="`address: ${ dialog.item.address }`" )
+        v-card-text(v-text="`type: ${ dialog.item.type }`" )
+        template(v-if="isPointer(dialog.item.type)" )
+          v-card-text(v-text="`name: ${ dialog.item.name } → `" )
+            a(:href="`#${dialog.item.address}`") {{ dialog.item.name }}
+        v-card-text data   : {{ dialog.item.data }}
+        v-card-text raw    : {{ dialog.item.raw }}
 </template>
 
 <script>
@@ -52,7 +88,11 @@ export default {
     },
     breakpointLines: [13],
     status: 'stop',
-    table: {},
+    table: [],
+    dialog: {
+      show: false,
+      item: {},
+    }
   }),
   methods: {
     doProcess (type) {
@@ -81,6 +121,15 @@ export default {
           this.status = 'stop';
         }
       });
+    },
+    openInformation (item) {
+      this.dialog.show = !this.dialog.show;
+      if (this.dialog.show) {
+        this.dialog.item = item;
+      }
+    },
+    isPointer (type) {
+      return type.includes('*');
     },
     valueToAddress(value) {
       const addr = value.split(' ').slice(-1);
