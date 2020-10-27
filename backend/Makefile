@@ -1,3 +1,4 @@
+# --- python -----
 PYTHON	= python3
 PYDOC	= pydoc
 PYCS	= $(shell find . -name "*.pyc")
@@ -9,7 +10,13 @@ WORKDIR	= ./
 PYLINT	= pylint
 LINTRCF	= pylintrc.txt
 LINTRST	= pylintresult.txt
-
+# --- clang ------
+CC		= clang
+SRCDIR	= target
+SRC		= main.c
+OBJ		= a.out
+CCFLAG	= -g -O0
+# ----------------
 
 all:
 	@:
@@ -28,12 +35,12 @@ test: all target
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) -m flask run
 
-check: target
+check: $(OBJ)
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) $(FLASK_APP)
 
-target: target/main.c
-	(cd target; clang -g -O0 main.c)
+$(OBJ): $(SRCDIR)/$(SRC)
+	(cd $(SRCDIR); $(CC) $(CCFLAG) $(SRC))
 
 lint: pylint clean
 	@if [ ! -e $(LINTRCF) ] ; then $(PYLINT) --generate-rcfile > $(LINTRCF)  ; fi
