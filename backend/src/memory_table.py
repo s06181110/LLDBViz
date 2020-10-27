@@ -39,10 +39,10 @@ class MemoryTable:
                 raw = format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
                 type = get_type(str(a_variable)),
             )
-            table_index = self.index_of_table_by_address(table['address'])
             if table_index:
                 self._table[table_index] = table
             else:
+            table_index = self.index_of_table_by_address(table.get('address'))
                 self._table.append(table)
 
     def index_of_table_by_address(self, addr):
@@ -51,7 +51,7 @@ class MemoryTable:
         """
         index = 0
         for var in self._table:
-            if var['address'] == addr:
+            if var.get('address') == addr:
                 return index
             index = index + 1
         return None
