@@ -56,6 +56,7 @@ class MemoryTable:
             index = index + 1
         return None
 
+""" Table Utilities """
 
 def format_raw(raw):
     """
