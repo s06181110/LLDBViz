@@ -33,9 +33,11 @@ class MemoryTable:
             get memory in binary
         """
         for a_variable in variables:
+            a_list = str(a_variable).split(')')[1].split()
             table = dict(
                 address = str(a_variable.GetAddress()),
-                data = str(a_variable).split(')')[1],
+                name = a_list[0],
+                data = a_list[2],
                 raw = format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
                 type = get_type(str(a_variable)),
             )
