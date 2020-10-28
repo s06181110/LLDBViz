@@ -29,7 +29,7 @@ clean:
 wipe: clean
 	@find . -name ".DS_Store" -exec rm {} ";" -exec echo rm -f {} ";"
 
-test: all target
+test: all $(OBJ)
 	export FLASK_APP=$(FLASK_APP) \
 	export FLASK_ENV=$(FLASK_ENV) \
 	export PYTHONPATH=`lldb -P`; \
