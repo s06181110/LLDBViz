@@ -40,7 +40,7 @@ v-container
               p {{ breakpoints.text }}
         v-row.justify-center
           v-btn.mr-8.red( dark @click="launchLLDB" ) launch
-          v-btn.blue-grey( dark @click="stopLLDB" href="#0x7ffee11324c4" ) stop
+          v-btn.blue-grey( dark @click="stopLLDB" ) stop
   v-card.mx-auto.mt-10( max-width="600" )
     v-card-title Stack Memory
     v-card( elevation="16" class="mx-auto" max-width="500"  )
