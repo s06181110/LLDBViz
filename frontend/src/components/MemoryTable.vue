@@ -41,10 +41,10 @@ v-container
         v-row.justify-center
           v-btn.mr-8.red( dark @click="launchLLDB" ) launch
           v-btn.blue-grey( dark @click="stopLLDB" ) stop
-  v-card.mx-auto.mt-10( max-width="600" )
+  v-card.mx-auto.my-10.pb-6( max-width="600" )
     v-card-title Stack Memory
     v-card( elevation="16" class="mx-auto" max-width="500"  )
-      v-virtual-scroll( :items="table" :bench="table.length" item-height="64" max-height="100" ref="vScroll")
+      v-virtual-scroll( :items="sortedTable" :bench="table.length" item-height="64" max-height="500")
           template( v-slot:default="{ item }" )
             v-list-item.mb-2( :key="item.address" :id="item.address" )
               v-list-item-content( style="width: 150px" )
@@ -55,7 +55,7 @@ v-container
               v-list-item-action
                 v-btn( icon depressed small @click="openInformation(item)" )
                   v-icon mdi-information-outline
-            v-divider( v-if="item.address != table[table.length - 1].address")
+            v-divider( v-if="item.address != sortedTable[table.length - 1].address")
     v-dialog( v-model="dialog.show " width="500" v-if="dialog.show" )
       v-card(style="white-space:pre-wrap;")
         v-card-title information
@@ -65,7 +65,7 @@ v-container
           p name: {{ dialog.item.name }}
             template(v-if="isPointer(dialog.item.type)" )
               | →
-              a(:href="`#${valueToAddress(dialog.item.data)}`" @click="dialog.show = false")  &{{ dialog.item.name }}
+              a(:href="`#${dialog.item.data.split('(')[0]}`" @click="dialog.show = false")  *{{ dialog.item.name }}
           p data   : {{ dialog.item.data }}
           p raw    : {{ dialog.item.raw }}
       //
