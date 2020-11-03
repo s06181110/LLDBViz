@@ -9,7 +9,7 @@ __author__ = 'Enomoto Yoshiki'
 __version__ = '1.0.0'
 __date__ = '2020/10/23 (Created: 2020/10/23)'
 
-import re
+from pprint import pprint
 
 class MemoryTable:
     """
@@ -23,7 +23,7 @@ class MemoryTable:
         """ get a table """
         return self._table
 
-    def set_variables(self, variables, read_memory):
+    def set_variables(self, variables, read_memory, func_name):
         """
         Parameters
         ----------
@@ -33,13 +33,12 @@ class MemoryTable:
             get memory in binary
         """
         for a_variable in variables:
-            a_list = str(a_variable).split(')')[1].split()
             table = dict(
-                address = str(a_variable.GetAddress()),
-                name = a_list[0],
-                data = a_list[2],
+                address = str(a_variable.GetLocation()),
+                name = a_variable.GetName(),
+                data = get_value(str(a_variable)),
                 raw = format_raw(read_memory(int(str(a_variable.GetAddress()), 16), a_variable.GetByteSize()).hex()),
-                type = get_type(str(a_variable)),
+                type = a_variable.GetTypeName(),
             )
             table_index = self.index_of_table_by_address(table.get('address'))
             if table_index is None:
@@ -71,13 +70,11 @@ def format_raw(raw):
         output = raw[byte:byte+2] + output
     return output
 
-def get_type(a_string):
+def get_value(a_string):
     """
-    get type by data string
+    get value
     ex)
-    (const char **) argv = 0x00007ffee6bb7510
-        -> const char **
+    (int *) ap = 0x00007ffee4ded554
+        -> 0x00007ffee4ded554
     """
-    result = re.match(r'\((.+)\)', a_string)
-    return result.group(1)
-
+    return a_string.split(' = ')[1]
