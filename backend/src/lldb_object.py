@@ -94,6 +94,21 @@ class LLDBObject:
             self._process = None
             self._table = MemoryTable()
 
+    def get_function(self):
+        self.update_frame()
+        func = self._frame.GetFunction()
+        pc_addr = self._frame.GetPCAddress()
+        start_addr = pc_addr.GetLoadAddress(self._target) - pc_addr.GetOffset()
+        # start_addr2 = func.GetStartAddress().GetLoadAddress(self._target)
+        end_addr = func.GetEndAddress().GetLoadAddress(self._target)
+        extent = end_addr - start_addr
+
+        self._function = dict(
+            address = start_addr,
+            name = self._frame.GetFunctionName(),
+            raw = self._process.ReadMemory(start_addr, extent, self.ERROR).hex()
+        )
+
     def get_stack_memory(self, extent=0x20):
         " Get current stack memory"
         if not self._process:
@@ -118,6 +133,7 @@ class LLDBObject:
         if not self._process:
             return 'None'
         self.update_addresses()
+        self.get_function()
         stack_pointer = self._pointer['sp']
         if self._pointer['sp'] == self._pointer['fp']:
             stack_pointer -= extent
@@ -125,7 +141,8 @@ class LLDBObject:
         # memory_string = stack_memory.hex()
 
         read_memory = (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR))
-        self._table.set_variables(self._frame.GetVariables(True, True, True, False), read_memory)
+        self._table.set_variables(self._frame.GetVariables(True, True, True, False), read_memory, self._function.get('name'))
+        # self._table.set_function(self._frame.GetFunction(), read_memory)
         return self._table.get_table()
 
     def get_variables(self):
