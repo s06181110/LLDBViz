@@ -79,6 +79,8 @@ v-container
 </template>
 
 <script>
+import * as R from 'ramda';
+
 export default {
   name: 'App',
   data: () => ({
@@ -94,6 +96,11 @@ export default {
       item: {},
     }
   }),
+  computed: {
+    sortedTable: function () { // sort by address
+      return R.sortBy(R.prop('address'))(this.table);
+    }
+  },
   methods: {
     doProcess (type) {
       this.$axios.get(`/api/process/${type}`).then(res => {
