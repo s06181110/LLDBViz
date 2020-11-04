@@ -23,7 +23,7 @@ class MemoryTable:
         """ get a table """
         return self._table
 
-    def set_variables(self, variables, read_memory, func_name):
+    def set_variables(self, variables, read_memory):
         """
         Parameters
         ----------
