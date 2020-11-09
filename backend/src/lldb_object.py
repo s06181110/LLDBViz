@@ -13,7 +13,7 @@ import os
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 import constants
-from memory_table import MemoryTable
+from stack_information import StackInformation
 
 class LLDBObject:
     """
@@ -37,9 +37,6 @@ class LLDBObject:
         self._process = None
         self._thread = None
         self._frame = None
-        self._function = None
-        self._pointer = { 'fp': None, 'sp': None}
-        self._table = MemoryTable()
 
     def set_breakpoint(self, lines):
         """ Set a breakpoint """
@@ -91,59 +88,62 @@ class LLDBObject:
             self._process.Continue()
         elif process == constants.STOP:
             self._process.Destroy()
-            self._process = None
-            self._table = MemoryTable()
+            self.__init__()
 
-    def get_function(self):
-        self.update_frame()
-        func = self._frame.GetFunction()
-        pc_addr = self._frame.GetPCAddress()
+    def get_function(self, frame=None):
+        if frame is None:
+            self.update_frame()
+            frame = self._frame
+        func = frame.GetFunction()
+        pc_addr = frame.GetPCAddress()
         start_addr = pc_addr.GetLoadAddress(self._target) - pc_addr.GetOffset()
         # start_addr2 = func.GetStartAddress().GetLoadAddress(self._target)
         end_addr = func.GetEndAddress().GetLoadAddress(self._target)
         extent = end_addr - start_addr
 
-        self._function = dict(
+        return dict(
             address = '0x' + format(start_addr, '016x'),
-            name = self._frame.GetFunctionName(),
+            name = frame.GetFunctionName(),
             raw = self._process.ReadMemory(start_addr, extent, self.ERROR).hex()
         )
-        return self._function
 
-    def get_stack_memory(self, extent=0x20):
+    def get_stack_memory(self):
         " Get current stack memory"
+        from pprint import pprint
         if not self._process:
             return 'None'
-        self.update_addresses()
-        stack_pointer = self._pointer['sp']
-        if self._pointer['sp'] == self._pointer['fp']:
-            stack_pointer -= extent
-        stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
-        memory_string = stack_memory.hex()
-        output = ''
-        for four_byte in range(0, len(memory_string), 8):
-            formatted_byte = ''
-            for byte in range(four_byte, four_byte + 8, 2):
-                formatted_byte = memory_string[byte:byte+2] + formatted_byte
-            output += "{}: {}\n".format(hex(stack_pointer+int(four_byte/2)), formatted_byte)
-
-        return output
-
-    def get_memory_table(self, extent=0x50):
-        " Get current stack memory"
-        if not self._process:
-            return 'None'
-        self.update_addresses()
-        stack_pointer = self._pointer['sp']
-        if self._pointer['sp'] == self._pointer['fp']:
-            stack_pointer -= extent
-        # stack_memory = self._process.ReadMemory(stack_pointer, extent, self.ERROR)
-        # memory_string = stack_memory.hex()
-
+        all_stack = []
         read_memory = (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR))
-        self._table.set_variables(self._frame.GetVariables(True, True, True, False), read_memory)
-        # self._table.set_function(self._frame.GetFunction(), read_memory)
-        return self._table.get_table()
+        for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
+            frame = self._thread.GetFrameAtIndex(index)
+            function = self.get_function(frame)
+            # func_stack = dict(function=function, stack_memory=[])
+            print('PC: {}, FP: {}, SP: {}'.format(hex(frame.GetPC()), hex(frame.GetFP()), hex(frame.GetSP())))
+            next_address = ''
+            for variable in frame.GetVariables(True, True, True, False):
+                stack_info = StackInformation()
+                stack_info.set_variable_info(function.get('name'), variable, read_memory)
+                all_stack.append(stack_info.as_dict())
+        # flatten = (lambda a_list: [item for l in a_list for item in l])
+        # all_stack = flatten(func_stacks.values())
+        sorted_stack = sorted(all_stack, key=lambda x:x['address'])
+        next_address = ''
+        all_stack = []
+        for stack in sorted_stack:
+            now = stack.get('address')
+            if next_address and now != next_address:
+                length = int(now, 16) - int(next_address, 16)
+                raw = read_memory(int(next_address, 16), length).hex()
+                padding = StackInformation()
+                padding.set_padding_info(next_address, raw)
+                all_stack.append(padding.as_dict())
+                pprint(padding.as_dict())
+            all_stack.append(stack)
+            pprint(stack)
+            next_address = '0x{:0=16x}'.format(int(now, 16) + len(stack.get('raw'))//2)
+
+    def read_memory(self):
+        return (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR).hex())
 
     def get_variables(self):
         """ Get Valiables """
