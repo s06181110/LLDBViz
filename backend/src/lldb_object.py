@@ -14,6 +14,7 @@ import os
 import lldb  # export PYTHONPATH=`lldb -P`
 import constants
 from stack_information import StackInformation
+from utility import format_raw
 
 class LLDBObject:
     """
