@@ -122,7 +122,10 @@ class LLDBObject:
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
-        sorted_stack = sorted(all_stack, key=lambda x:x['address'])
+        all_stack = self._fill_with_padding(all_stack)
+
+    def _fill_with_padding(self, stack):
+        sorted_stack = sorted(stack, key=lambda x:x['address'])
         next_address = ''
         all_stack = []
         for stack in sorted_stack:
@@ -135,6 +138,7 @@ class LLDBObject:
                 all_stack.append(padding.as_dict())
             all_stack.append(stack)
             next_address = '0x{:0=16x}'.format(int(now, 16) + len(stack.get('raw'))//2)
+        return all_stack
 
     def read_memory(self):
         return (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR).hex())
