@@ -65,15 +65,6 @@ class LLDBObject:
         if self._thread:
             self._frame = self._thread.GetFrameAtIndex(index)
 
-    def update_addresses(self):
-        """ Update some address """
-        self.update_frame()
-        if self._frame:
-            self._pointer = {
-                'fp': self._frame.GetFP(),
-                'sp': self._frame.GetSP(),
-            }
-
     def debug_process(self, process):
         """ debugger step into """
         self.update_thread()
