@@ -44,11 +44,7 @@ v-container
   v-card.mx-auto.my-10.pb-6( max-width="600" )
     v-card-title Stack Memory
     v-card( elevation="16" class="mx-auto" max-width="500"  )
-      //
-        v-expansion-panels(focusable)
-          v-expansion-panel()
-          
-      v-virtual-scroll( :items="sortedTable" :bench="table.length" item-height="64" max-height="500")
+      v-virtual-scroll( :items="stack" :bench="stack.length" item-height="64" max-height="500")
           template( v-slot:default="{ item }" )
             v-list-item( :key="item.address" :id="item.address" link )
               v-list-item-content( style="width: 150px" )
@@ -59,7 +55,7 @@ v-container
               v-list-item-action
                 v-btn( icon depressed small @click="openInformation(item)" )
                   v-icon mdi-information-outline
-            v-divider( v-if="item.address != sortedTable[table.length - 1].address")
+            v-divider( v-if="item.address != stack[stack.length - 1].address")
     v-dialog( v-model="dialog.show " width="500" v-if="dialog.show" )
       v-card(style="white-space:pre-wrap;")
         v-card-title information
@@ -83,7 +79,7 @@ v-container
 </template>
 
 <script>
-import * as R from 'ramda';
+// import * as R from 'ramda';
 
 export default {
   name: 'App',
@@ -94,25 +90,17 @@ export default {
     },
     breakpointLines: [13],
     status: 'stop',
-    table: [],
     stack: [],
     dialog: {
       show: false,
       item: {},
     }
   }),
-  computed: {
-    sortedTable: function () { // sort by address
-      return R.sortBy(R.prop('address'))(this.table);
-    }
-  },
   methods: {
     doProcess (type) {
       this.$axios.get(`/api/process/${type}`).then(res => {
-        const hoge = res.data.func;
-        hoge.vars = res.data.vars;
-        console.log(hoge);
-        // this.table = res.data;
+        console.log(res.data);
+        this.stack = res.data;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
@@ -126,8 +114,8 @@ export default {
       this.$axios.get('/api/launch').then(res => {
         if (res.status === 200) {
           this.status = 'launch';
-          this.stack.push(res.data);
-          // this.table = res.data;
+          console.log(res.data);
+          this.stack = res.data;
         }
       });
     },
