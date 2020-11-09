@@ -101,8 +101,9 @@ class LLDBObject:
 
     def get_stack_memory(self):
         " Get current stack memory"
-        if not self._process:
+        if self._process is None:
             return 'None'
+        self.update_thread()
         all_stack = []
         for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
             frame = self._thread.GetFrameAtIndex(index)
@@ -113,6 +114,7 @@ class LLDBObject:
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
         all_stack = self._fill_with_padding(all_stack)
+        return all_stack
 
     def _fill_with_padding(self, stack):
         sorted_stack = sorted(stack, key=lambda x:x['address'])
