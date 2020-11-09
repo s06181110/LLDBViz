@@ -29,17 +29,17 @@ clean:
 wipe: clean
 	@find . -name ".DS_Store" -exec rm {} ";" -exec echo rm -f {} ";"
 
-test: all $(OBJ)
+test: all $(SRCDIR)/$(OBJ)
 	export FLASK_APP=$(FLASK_APP) \
 	export FLASK_ENV=$(FLASK_ENV) \
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) -m flask run
 
-check: $(OBJ)
+check: $(SRCDIR)/$(OBJ)
 	export PYTHONPATH=`lldb -P`; \
 	$(PYTHON) $(FLASK_APP)
 
-$(OBJ): $(SRCDIR)/$(SRC)
+$(SRCDIR)/$(OBJ): $(SRCDIR)/$(SRC)
 	(cd $(SRCDIR); $(CC) $(CCFLAG) $(SRC))
 
 lint: pylint clean
