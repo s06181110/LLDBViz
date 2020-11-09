@@ -117,15 +117,12 @@ class LLDBObject:
         for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
             frame = self._thread.GetFrameAtIndex(index)
             function = self.get_function(frame)
-            # func_stack = dict(function=function, stack_memory=[])
             print('PC: {}, FP: {}, SP: {}'.format(hex(frame.GetPC()), hex(frame.GetFP()), hex(frame.GetSP())))
             next_address = ''
             for variable in frame.GetVariables(True, True, True, False):
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
-        # flatten = (lambda a_list: [item for l in a_list for item in l])
-        # all_stack = flatten(func_stacks.values())
         sorted_stack = sorted(all_stack, key=lambda x:x['address'])
         next_address = ''
         all_stack = []
