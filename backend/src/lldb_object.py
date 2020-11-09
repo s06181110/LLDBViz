@@ -118,7 +118,6 @@ class LLDBObject:
             frame = self._thread.GetFrameAtIndex(index)
             function = self.get_function(frame)
             print('PC: {}, FP: {}, SP: {}'.format(hex(frame.GetPC()), hex(frame.GetFP()), hex(frame.GetSP())))
-            next_address = ''
             for variable in frame.GetVariables(True, True, True, False):
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
