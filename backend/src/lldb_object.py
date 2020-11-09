@@ -101,7 +101,6 @@ class LLDBObject:
 
     def get_stack_memory(self):
         " Get current stack memory"
-        from pprint import pprint
         if not self._process:
             return 'None'
         all_stack = []
