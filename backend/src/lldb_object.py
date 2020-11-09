@@ -129,15 +129,15 @@ class LLDBObject:
         next_address = ''
         all_stack = []
         for stack in sorted_stack:
-            now = stack.get('address')
-            if next_address and now != next_address:
-                length = int(now, 16) - int(next_address, 16)
+            current_address = stack.get('address')
+            if next_address and current_address != next_address:
+                length = int(current_address, 16) - int(next_address, 16)
                 raw = self.read_memory()(int(next_address, 16), length)
                 padding = StackInformation()
                 padding.set_padding_info(next_address, raw)
                 all_stack.append(padding.as_dict())
             all_stack.append(stack)
-            next_address = '0x{:0=16x}'.format(int(now, 16) + len(stack.get('raw'))//2)
+            next_address = '0x{:0=16x}'.format(int(current_address, 16) + len(stack.get('raw'))//2)
         return all_stack
 
     def read_memory(self):
