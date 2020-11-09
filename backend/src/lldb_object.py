@@ -104,7 +104,7 @@ class LLDBObject:
         return dict(
             address = '0x' + format(start_addr, '016x'),
             name = frame.GetFunctionName(),
-            raw = self._process.ReadMemory(start_addr, extent, self.ERROR).hex()
+            raw = format_raw(self.read_memory()(start_addr, extent))
         )
 
     def get_stack_memory(self):
@@ -113,7 +113,6 @@ class LLDBObject:
         if not self._process:
             return 'None'
         all_stack = []
-        read_memory = (lambda addr, size: self._process.ReadMemory(addr, size, self.ERROR))
         for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
             frame = self._thread.GetFrameAtIndex(index)
             function = self.get_function(frame)
@@ -122,7 +121,7 @@ class LLDBObject:
             next_address = ''
             for variable in frame.GetVariables(True, True, True, False):
                 stack_info = StackInformation()
-                stack_info.set_variable_info(function.get('name'), variable, read_memory)
+                stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
         # flatten = (lambda a_list: [item for l in a_list for item in l])
         # all_stack = flatten(func_stacks.values())
@@ -133,13 +132,11 @@ class LLDBObject:
             now = stack.get('address')
             if next_address and now != next_address:
                 length = int(now, 16) - int(next_address, 16)
-                raw = read_memory(int(next_address, 16), length).hex()
+                raw = self.read_memory()(int(next_address, 16), length)
                 padding = StackInformation()
                 padding.set_padding_info(next_address, raw)
                 all_stack.append(padding.as_dict())
-                pprint(padding.as_dict())
             all_stack.append(stack)
-            pprint(stack)
             next_address = '0x{:0=16x}'.format(int(now, 16) + len(stack.get('raw'))//2)
 
     def read_memory(self):
