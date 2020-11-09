@@ -44,9 +44,13 @@ v-container
   v-card.mx-auto.my-10.pb-6( max-width="600" )
     v-card-title Stack Memory
     v-card( elevation="16" class="mx-auto" max-width="500"  )
+      //
+        v-expansion-panels(focusable)
+          v-expansion-panel()
+          
       v-virtual-scroll( :items="sortedTable" :bench="table.length" item-height="64" max-height="500")
           template( v-slot:default="{ item }" )
-            v-list-item.mb-2( :key="item.address" :id="item.address" )
+            v-list-item( :key="item.address" :id="item.address" link )
               v-list-item-content( style="width: 150px" )
                 v-list-item-title {{ item.address }}
               v-divider.mx-4(vertical)
@@ -91,6 +95,7 @@ export default {
     breakpointLines: [13],
     status: 'stop',
     table: [],
+    stack: [],
     dialog: {
       show: false,
       item: {},
@@ -104,7 +109,10 @@ export default {
   methods: {
     doProcess (type) {
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.table = res.data;
+        const hoge = res.data.func;
+        hoge.vars = res.data.vars;
+        console.log(hoge);
+        // this.table = res.data;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
@@ -118,7 +126,8 @@ export default {
       this.$axios.get('/api/launch').then(res => {
         if (res.status === 200) {
           this.status = 'launch';
-          this.table = res.data;
+          this.stack.push(res.data);
+          // this.table = res.data;
         }
       });
     },
