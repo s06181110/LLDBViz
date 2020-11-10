@@ -21,4 +21,4 @@ def get_value(a_string):
     (int *) ap = 0x00007ffee4ded554
         -> 0x00007ffee4ded554
     """
-    return a_string.split(' = ')[1]
+    return a_string.split(' = ', 1)[1]
