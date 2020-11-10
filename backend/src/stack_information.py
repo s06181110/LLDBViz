@@ -73,7 +73,7 @@ class StackInformation:
         read_memory: lambda (addr, size) -> str
             get memory in binary
         """
-        memory_raw = read_memory(int(str(variable.GetAddress()), 16), variable.GetByteSize())
+        memory_raw = read_memory(int(str(variable.GetLocation()), 16), variable.GetByteSize())
         self._set(
             str(variable.GetLocation()),
             scope,
