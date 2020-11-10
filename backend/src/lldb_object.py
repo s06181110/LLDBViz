@@ -109,7 +109,7 @@ class LLDBObject:
             frame = self._thread.GetFrameAtIndex(index)
             function = self.get_function(frame)
             print('PC: {}, FP: {}, SP: {}'.format(hex(frame.GetPC()), hex(frame.GetFP()), hex(frame.GetSP())))
-            for variable in frame.GetVariables(True, True, True, False):
+            for variable in frame.GetVariables(True, True, False, False):
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
