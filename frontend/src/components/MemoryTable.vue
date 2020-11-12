@@ -27,19 +27,6 @@ v-container
                       a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
                   p data   : {{ item.data }}
                   p raw    : {{ item.raw }}
-                  
-              //v-virtual-scroll( :items="stack" :bench="stack.length" item-height="64" max-height="500")
-                  template( v-slot:default="{ item }" )
-                    v-list-item( :key="item.address" :id="item.address" link )
-                      v-list-item-content( style="width: 150px" )
-                        v-list-item-title {{ item.address }}
-                      v-divider.mx-4(vertical)
-                      v-list-item-content
-                        v-list-item-title {{ item.name }}
-                      v-list-item-action
-                        v-btn( icon depressed small @click="openInformation(item)" )
-                          v-icon mdi-information-outline
-                    v-divider( v-if="item.address != stack[stack.length - 1].address")
           v-dialog( v-model="dialog.show " width="500" v-if="dialog.show" )
             v-card(style="white-space:pre-wrap;")
               v-card-title information
