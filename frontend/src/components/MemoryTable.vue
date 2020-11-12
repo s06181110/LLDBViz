@@ -12,8 +12,23 @@ v-container
         v-col.col-12
           v-card.pb-12
             v-card-title Stack Memory
-            v-card.mt-8( elevation="16" class="mx-auto" max-width="500"  )
-              v-virtual-scroll( :items="stack" :bench="stack.length" item-height="64" max-height="500")
+            v-expansion-panels( multiple focusable accordion )
+              v-expansion-panel(v-for="item in stack" :key="item.address")
+                v-expansion-panel-header  
+                  | {{ item.address}}
+                  v-divider.mx-4( vertical style="color: black")
+                  | {{ item.name }}
+                v-expansion-panel-content.pt-4
+                  p( v-text="`address: ${ item.address }`" )
+                  p( v-text="`type: ${ item.type }`" )
+                  p name: {{ item.name }}
+                    template(v-if="isPointer(item.type)" )
+                      | →
+                      a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
+                  p data   : {{ item.data }}
+                  p raw    : {{ item.raw }}
+                  
+              //v-virtual-scroll( :items="stack" :bench="stack.length" item-height="64" max-height="500")
                   template( v-slot:default="{ item }" )
                     v-list-item( :key="item.address" :id="item.address" link )
                       v-list-item-content( style="width: 150px" )
