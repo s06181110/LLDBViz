@@ -21,7 +21,14 @@ def hello_world():
 def launch_lldb():
     """ create lldb """
     LLDB.launch()
-    return 'launch'
+    memory = LLDB.get_stack_memory()
+    register = LLDB.get_register()
+    
+    response = dict(
+        memory = memory,
+        register = register
+    )
+    return jsonify(response)
 
 @app.route('/breakpoints', methods=['POST'])
 def set_breakpoint():
@@ -34,8 +41,14 @@ def set_breakpoint():
 def debug_process(process):
     """ debugger process """
     LLDB.debug_process(process)
-    table = LLDB.get_memory_table()
-    return jsonify(table)
+    memory = LLDB.get_stack_memory()
+    register = LLDB.get_register()
+    
+    response = dict(
+        memory = memory,
+        register = register
+    )
+    return jsonify(response)
 
 def test():
     """

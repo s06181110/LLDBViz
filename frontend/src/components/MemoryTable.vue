@@ -73,7 +73,7 @@ v-container
                     v-btn( @click="doProcess('STEP_OUT')" icon small )
                       v-icon mdi-debug-step-out
         v-col.col-12
-          v-card.mx-auto.mt-10( max-width="600" )
+          v-card.mt-10
             v-card-title Debugger
             v-card-text
               v-container.align-center
@@ -81,7 +81,7 @@ v-container
                   v-col.col-12
                     p.text--primary status: {{ status }}
                   v-col.col-6
-                    v-select( v-model="breakpointLines" :items="[11,13]" label="breakpoint"  multiple dense )
+                    v-select( v-model="breakpointLines" :items="[11,13,25]" label="breakpoint"  multiple dense )
                   v-col( style="text-align: center;" )
                     v-btn.primary( @click="setBreakpoints" ) set
                   v-col.col-12
@@ -90,6 +90,14 @@ v-container
                       p {{ breakpoints.text }}
                 v-row.justify-center
                   v-btn.mr-8.red( dark @click="launchLLDB" ) launch
+                  v-btn.mr-8.primary( dark @click="stopLLDB" ) stop
+        v-col.col-12(v-if="status === 'launch'" )
+          v-card.mt-10
+            v-card-title Register
+            v-card-text
+              p SP: {{ register.sp }}
+              p FP: {{ register.fp }}
+              p PC: {{ register.pc }}
 </template>
 
 <script>
@@ -102,10 +110,11 @@ export default {
       show: true,
       text: '',
     },
-    breakpointLines: [13],
+    breakpointLines: [25],
     status: 'stop',
     previous: [],
     stack: [],
+    register: {},
     dialog: {
       show: false,
       item: {},
@@ -115,7 +124,8 @@ export default {
     doProcess (type) {
       this.previous = this.stack;
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.stack = res.data;
+        this.stack = res.data.memory;
+        this.register = res.data.register;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
@@ -129,7 +139,8 @@ export default {
       this.$axios.get('/api/launch').then(res => {
         if (res.status === 200) {
           this.status = 'launch';
-          this.stack = res.data;
+          this.stack = res.data.memory;
+          this.register = res.data.register;
         }
       });
     },

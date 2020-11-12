@@ -10,11 +10,12 @@ __version__ = '1.0.0'
 __date__ = '2020/10/12 (Created: 2020/10/12)'
 
 import os
+import re
 # pylint: disable=E0401
 import lldb  # export PYTHONPATH=`lldb -P`
 import constants
 from stack_information import StackInformation
-from utility import format_raw
+from utility import format_raw, list_to_pattern
 
 class LLDBObject:
     """
@@ -97,6 +98,16 @@ class LLDBObject:
             address = '0x' + format(start_addr, '016x'),
             name = frame.GetFunctionName(),
             raw = format_raw(self.read_memory()(start_addr, extent))
+        )
+    
+    def get_register(self, frame=None):
+        if frame is None:
+            self.update_frame()
+            frame = self._frame
+        return dict(
+            pc = hex(frame.GetPC()),
+            sp = hex(frame.GetSP()),
+            fp = hex(frame.GetFP())
         )
 
     def get_stack_memory(self):
