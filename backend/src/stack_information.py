@@ -82,6 +82,6 @@ class StackInformation:
             format_raw(memory_raw),
             variable.GetTypeName())
 
-    def set_padding_info(self, address, raw, pc=None, fp=None):
-        self._set(address, '', 'padding', 'None', format_raw(raw), 'None')
+    def set_padding_info(self, address, raw, name='padding', data='None'):
+        self._set(address, '', name, data, raw, 'None')
 

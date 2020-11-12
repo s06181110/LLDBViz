@@ -105,28 +105,38 @@ class LLDBObject:
             return 'None'
         self.update_thread()
         all_stack = []
+        pointers = []
         for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
             frame = self._thread.GetFrameAtIndex(index)
             function = self.get_function(frame)
-            print('PC: {}, FP: {}, SP: {}'.format(hex(frame.GetPC()), hex(frame.GetFP()), hex(frame.GetSP())))
+            pointers.append(self.get_register(frame))
             for variable in frame.GetVariables(True, True, False, False):
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
-        all_stack = self._fill_with_padding(all_stack)
+        all_stack = self._fill_with_padding(all_stack, pointers)
         return all_stack
 
-    def _fill_with_padding(self, stack):
+    def _fill_with_padding(self, stack, pointers):
         sorted_stack = sorted(stack, key=lambda x:x['address'])
+        pc_list = list_to_pattern([pointer.get('pc')[2:] for pointer in pointers])
+        fp_list = list_to_pattern([pointer.get('fp')[2:] for pointer in pointers])
         next_address = ''
         all_stack = []
         for stack in sorted_stack:
             current_address = stack.get('address')
             if next_address and current_address != next_address:
                 length = int(current_address, 16) - int(next_address, 16)
-                raw = self.read_memory()(int(next_address, 16), length)
+                raw = format_raw(self.read_memory()(int(next_address, 16), length))
+                pc = re.search(pc_list, raw)
+                fp = re.search(fp_list, raw)
                 padding = StackInformation()
-                padding.set_padding_info(next_address, raw)
+                if pc and fp:
+                    pc_str = '0x{:0=16x}'.format(int(pc.group(), 16))
+                    fp_str = '0x{:0=16x}'.format(int(fp.group(), 16))
+                    padding.set_padding_info(next_address, raw, 'return infomation', dict(pc=pc_str, fp=fp_str))
+                else:
+                    padding.set_padding_info(next_address, raw)
                 all_stack.append(padding.as_dict())
             all_stack.append(stack)
             next_address = '0x{:0=16x}'.format(int(current_address, 16) + len(stack.get('raw'))//2)

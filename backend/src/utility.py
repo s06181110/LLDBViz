@@ -22,3 +22,6 @@ def get_value(a_string):
         -> 0x00007ffee4ded554
     """
     return a_string.split(' = ', 1)[1]
+
+def list_to_pattern(a_list):
+    return r'|'.join(a_list)
