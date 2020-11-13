@@ -1,17 +1,15 @@
 <template lang="pug">
 v-container
   v-row
-    v-col.col-4
-      v-row(no-gutters)
-        v-col.col-12
-          v-card
-            v-card-title Script
+    v-col.col-8
+      v-card.col-12.pb-10
+        v-card-title Memory
+        v-row.justify-space-around(no-gutters)
+          v-col.col-5
+            v-card-title Static Region
             v-card-text comming soon
-    v-col.col-4
-      v-row(no-gutters)
-        v-col.col-12
-          v-card.pb-12
-            v-card-title Stack Memory
+          v-col.col-5
+            v-card-title Memory Region
             v-expansion-panels( multiple focusable accordion )
               v-expansion-panel(v-for="item in stack" :key="item.address")
                 v-expansion-panel-header  
