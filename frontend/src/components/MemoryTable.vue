@@ -27,18 +27,6 @@ v-container
                       a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
                   p data   : {{ item.data }}
                   p raw    : {{ item.raw }}
-          v-dialog( v-model="dialog.show " width="500" v-if="dialog.show" )
-            v-card(style="white-space:pre-wrap;")
-              v-card-title information
-              v-card-text
-                p( v-text="`address: ${ dialog.item.address }`" )
-                p( v-text="`type: ${ dialog.item.type }`" )
-                p name: {{ dialog.item.name }}
-                  template(v-if="isPointer(dialog.item.type)" )
-                    | →
-                    a(:href="`#${dialog.item.data.split('(')[0]}`" @click="dialog.show = false")  *{{ dialog.item.name }}
-                p data   : {{ dialog.item.data }}
-                p raw    : {{ dialog.item.raw }}
     v-col.col-4
       v-row(no-gutters)
         v-col.col-12
