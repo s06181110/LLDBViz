@@ -15,7 +15,7 @@ import re
 import lldb  # export PYTHONPATH=`lldb -P`
 import constants
 from stack_information import StackInformation
-from utility import format_raw, list_to_pattern
+from utility import format_raw, list_to_pattern, symbol_type_to_str
 
 class LLDBObject:
     """
@@ -110,6 +110,26 @@ class LLDBObject:
             sp = hex(frame.GetSP()),
             fp = hex(frame.GetFP())
         )
+        
+    def get_static_memory(self):
+        if self._process is None:
+            return 'None'
+        type_to_collect = ['Code', 'Trampoline', 'Data']
+        all_stack = []
+        for symbol in self._target.GetModuleAtIndex(0).get_symbols_array():
+            symbol_type = symbol_type_to_str(symbol.GetType())
+            if symbol_type in type_to_collect:
+                start_addr = symbol.GetStartAddress().GetLoadAddress(self._target)
+                end_addr = symbol.GetEndAddress().GetLoadAddress(self._target)
+                extent = end_addr - start_addr
+                static = dict(
+                    address = '0x' + format(start_addr, '016x'),
+                    name = symbol.GetName(),
+                    raw = format_raw(self.read_memory()(start_addr, extent)),
+                    type = symbol_type
+                )
+                all_stack.append(static)
+        return  sorted(all_stack, key=lambda x:x['address'])
 
     def get_stack_memory(self):
         " Get current stack memory"
