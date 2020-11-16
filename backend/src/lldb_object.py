@@ -89,17 +89,18 @@ class LLDBObject:
             frame = self._frame
         func = frame.GetFunction()
         pc_addr = frame.GetPCAddress()
-        start_addr = pc_addr.GetLoadAddress(self._target) - pc_addr.GetOffset()
-        # start_addr2 = func.GetStartAddress().GetLoadAddress(self._target)
+        # start_addr = pc_addr.GetLoadAddress(self._target) - pc_addr.GetOffset()
+        start_addr = func.GetStartAddress().GetLoadAddress(self._target)
         end_addr = func.GetEndAddress().GetLoadAddress(self._target)
         extent = end_addr - start_addr
-
+        
         return dict(
             address = '0x' + format(start_addr, '016x'),
             name = frame.GetFunctionName(),
-            raw = format_raw(self.read_memory()(start_addr, extent))
+            raw = format_raw(self.read_memory()(start_addr, extent)),
+            type = str(func.GetType())
         )
-    
+
     def get_register(self, frame=None):
         if frame is None:
             self.update_frame()
