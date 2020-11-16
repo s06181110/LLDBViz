@@ -93,7 +93,7 @@ class LLDBObject:
         start_addr = func.GetStartAddress().GetLoadAddress(self._target)
         end_addr = func.GetEndAddress().GetLoadAddress(self._target)
         extent = end_addr - start_addr
-        
+
         return dict(
             address = '0x' + format(start_addr, '016x'),
             name = frame.GetFunctionName(),
@@ -110,7 +110,7 @@ class LLDBObject:
             sp = hex(frame.GetSP()),
             fp = hex(frame.GetFP())
         )
-        
+
     def get_static_memory(self):
         if self._process is None:
             return 'None'

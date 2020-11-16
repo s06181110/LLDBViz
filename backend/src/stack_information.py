@@ -45,16 +45,15 @@ class StackInformation:
         self._data = data
         self._raw = raw
         self._type = a_type
-    
-    
+
     def get_start_address(self):
         return self._address
-    
+
     def get_end_address(self):
         return '0x{:0=16x}'.format(
-            int(self._address, 16) 
+            int(self._address, 16)
             + len(self._raw)//2)
-    
+
     def as_dict(self):
         return dict(
             address = self._address,
@@ -84,4 +83,3 @@ class StackInformation:
 
     def set_padding_info(self, address, raw, name='padding', data='None'):
         self._set(address, 'None', name, data, raw, 'None')
-
