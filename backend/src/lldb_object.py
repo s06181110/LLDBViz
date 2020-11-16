@@ -116,6 +116,7 @@ class LLDBObject:
             return 'None'
         type_to_collect = ['Code', 'Trampoline', 'Data']
         all_stack = []
+        # parse a.out module
         for symbol in self._target.GetModuleAtIndex(0).get_symbols_array():
             symbol_type = symbol_type_to_str(symbol.GetType())
             if symbol_type in type_to_collect:
