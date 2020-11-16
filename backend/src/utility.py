@@ -3,6 +3,8 @@
 
 """ Memory Infomation Utilities """
 
+import constants
+
 def format_raw(raw):
     """
     format memory raw string
@@ -25,3 +27,6 @@ def get_value(a_string):
 
 def list_to_pattern(a_list):
     return r'|'.join(a_list)
+
+def symbol_type_to_str(type_num):
+    return constants.TYPE_SYMBOLS[type_num]
