@@ -7,7 +7,16 @@ v-container
         v-row.justify-space-around(no-gutters)
           v-col.col-5
             v-card-title Static Region
-            v-card-text comming soon
+            v-expansion-panels( multiple focusable accordion )
+              v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'")
+                v-expansion-panel-header  
+                  | {{ item.address}}
+                  v-divider.mx-4( vertical style="color: black")
+                  | {{ item.name }}
+                v-expansion-panel-content.pt-4
+                  pre.stack-data
+                    p( v-text="`type : ${ item.type }`" )
+                    p raw  : {{ item.raw }}
           v-col.col-5
             v-card-title Memory Region
             v-expansion-panels( multiple focusable accordion )
@@ -88,6 +97,7 @@ export default {
     previous: [],
     stack: [],
     register: {},
+    static: {},
     dialog: {
       show: false,
       item: {},
@@ -99,6 +109,7 @@ export default {
       this.$axios.get(`/api/process/${type}`).then(res => {
         this.stack = res.data.memory;
         this.register = res.data.register;
+        this.static = res.data.static;
       }).catch(e => console.error(e));
     },
     setBreakpoints () {
@@ -114,6 +125,7 @@ export default {
           this.status = 'launch';
           this.stack = res.data.memory;
           this.register = res.data.register;
+          this.static = res.data.static;
         }
       });
     },
@@ -136,3 +148,9 @@ export default {
   }
 };
 </script>
+
+<style>
+.stack-data {
+  white-space: pre-wrap;
+}
+</style>
