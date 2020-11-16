@@ -155,11 +155,11 @@ class LLDBObject:
         pointers = []
         for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
             frame = self._thread.GetFrameAtIndex(index)
-            function = self.get_function(frame)
+            function_name = frame.GetFunctionName()
             pointers.append(self.get_register(frame))
             for variable in frame.GetVariables(True, True, False, False):
                 stack_info = StackInformation()
-                stack_info.set_variable_info(function.get('name'), variable, self.read_memory())
+                stack_info.set_variable_info(function_name, variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
         all_stack = self._fill_with_padding(all_stack, pointers)
         return all_stack
