@@ -83,5 +83,5 @@ class StackInformation:
             variable.GetTypeName())
 
     def set_padding_info(self, address, raw, name='padding', data='None'):
-        self._set(address, '', name, data, raw, 'None')
+        self._set(address, 'None', name, data, raw, 'None')
 
