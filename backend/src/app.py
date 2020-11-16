@@ -21,11 +21,13 @@ def hello_world():
 def launch_lldb():
     """ create lldb """
     LLDB.launch()
+    static = LLDB.get_static_memory()
     memory = LLDB.get_stack_memory()
     register = LLDB.get_register()
     
     response = dict(
         memory = memory,
+        static = static,
         register = register
     )
     return jsonify(response)
@@ -40,12 +42,14 @@ def set_breakpoint():
 @app.route('/process/<string:process>')
 def debug_process(process):
     """ debugger process """
-    LLDB.debug_process(process)
+    LLDB.debug_process(process) 
+    static = LLDB.get_static_memory()
     memory = LLDB.get_stack_memory()
     register = LLDB.get_register()
-    
+
     response = dict(
         memory = memory,
+        static = static,
         register = register
     )
     return jsonify(response)
