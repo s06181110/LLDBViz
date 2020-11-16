@@ -129,7 +129,22 @@ class LLDBObject:
                     type = symbol_type
                 )
                 all_stack.append(static)
-        return  sorted(all_stack, key=lambda x:x['address'])
+        all_stack = self._fill_with_Unanalyzed(all_stack)
+        return all_stack
+
+    def _fill_with_Unanalyzed(self, stack):
+        sorted_stack = sorted(stack, key=lambda x:x['address'])
+        next_address = ''
+        all_stack = []
+        for a_data in sorted_stack:
+            current_address = a_data.get('address')
+            if next_address and current_address != next_address:
+                padding = StackInformation()
+                padding.set_padding_info(next_address, '', 'Unanalyzed')
+                all_stack.append(padding.as_dict())
+            all_stack.append(a_data)
+            next_address = '0x{:0=16x}'.format(int(current_address, 16) + len(a_data.get('raw'))//2)
+        return all_stack
 
     def get_stack_memory(self):
         " Get current stack memory"
