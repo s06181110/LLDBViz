@@ -20,20 +20,20 @@ v-container
           v-col.col-5
             v-card-title Memory Region
             v-expansion-panels( multiple focusable accordion )
-              v-expansion-panel(v-for="item in stack" :key="item.address")
-                v-expansion-panel-header  
+              v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'")
+                v-expansion-panel-header
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
                   | {{ item.name }}
                 v-expansion-panel-content.pt-4
-                  p( v-text="`address: ${ item.address }`" )
-                  p( v-text="`type: ${ item.type }`" )
-                  p name: {{ item.name }}
-                    template(v-if="isPointer(item.type)" )
-                      | →
+                 pre.stack-data
+                  p( v-text="`scope : ${ item.scope }`" )
+                  p( v-text="`type  : ${ item.type }`" )
+                  template(v-if="isPointer(item.type)" )
+                    p link  : 
                       a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
-                  p data   : {{ item.data }}
-                  p raw    : {{ item.raw }}
+                  p data  : {{ item.data }}
+                  p raw   : {{ item.raw }}
     v-col.col-4
       v-row(no-gutters)
         v-col.col-12
