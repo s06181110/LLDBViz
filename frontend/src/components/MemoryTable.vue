@@ -2,14 +2,14 @@
 v-container
   v-row
     v-col.col-8
-      v-card.col-12.pb-10
+      v-card.col-12.pb-10#memory
         v-card-title Memory
         v-row.justify-space-around(no-gutters)
           v-col.col-5
             v-card-title Static Region
             v-expansion-panels( multiple focusable accordion )
-              v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'")
-                v-expansion-panel-header  
+              v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'" @click="update()")
+                v-expansion-panel-header(:id="item.address")
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
                   | {{ item.name }}
@@ -20,8 +20,8 @@ v-container
           v-col.col-5
             v-card-title Memory Region
             v-expansion-panels( multiple focusable accordion )
-              v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'")
-                v-expansion-panel-header
+              v-expansion-panel.white(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update(item.address)")
+                v-expansion-panel-header(:id="item.address" :ref="item.address")
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
                   | {{ item.name }}
@@ -29,9 +29,10 @@ v-container
                  pre.stack-data
                   p( v-text="`scope : ${ item.scope }`" )
                   p( v-text="`type  : ${ item.type }`" )
-                  template(v-if="isPointer(item.type)" )
-                    p link  : 
-                      a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
+                  template(v-if="isPointer(item)" )
+                    p ref   : 
+                      a(@click="" ) *{{ item.name }}
+                      //- a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
                   p data  : {{ item.data }}
                   p raw   : {{ item.raw }}
     v-col.col-4
@@ -42,7 +43,7 @@ v-container
             v-card-text
               v-container
                 v-row.text-center
-                  v-col.col-3
+                  v-col.col-3(ref="test")
                     v-btn( @click="doProcess('CONTINUE')" icon small )
                       v-icon mdi-step-forward
                   v-col.col-3
@@ -83,6 +84,7 @@ v-container
 </template>
 
 <script>
+import LeaderLine from 'leader-line-vue';
 
 export default {
   name: 'App',
@@ -97,10 +99,8 @@ export default {
     stack: [],
     register: {},
     static: {},
-    dialog: {
-      show: false,
-      item: {},
-    }
+    lines: {},
+    previousLine: null
   }),
   methods: {
     doProcess (type) {
@@ -141,8 +141,46 @@ export default {
         this.dialog.item = item;
       }
     },
-    isPointer (type) {
-      return type.includes('*');
+    isPointer (item) {
+      if (!item.type.includes('*')) return false;
+      setTimeout(function() {
+        this.addLeaderLine(item.address, item.data);
+      }.bind(this), 500);
+      return true;
+    },
+    addLeaderLine(startId, endId) {
+      const startComponent = this.$refs[startId] ? this.$refs[startId][0] : null;
+      const endElement = document.getElementById(this.preferredId(endId));
+      if (!startComponent || !endElement ) return;
+      const options = {
+        path: 'grid',
+        startSocket: endId.length !== 18 ? 'left' : 'right',
+        endSocket: 'right',
+        hide: true
+      };
+      const aLine = LeaderLine.setLine(startComponent.$el, endElement, options);
+      this.lines[startId] = aLine;
+    },
+    preferredId (id) {
+      return id.length !== 18 ? id.slice(0, 18) : id;
+    },
+    update(address) {
+      const aLine = this.lines[address];
+      if (!aLine) return;
+      setTimeout(() => {
+        Object.keys(this.lines).forEach(key => {
+          const aComponent = this.$refs[key][0];
+          const aLine = this.lines[key];
+          aLine.position();
+          if (aComponent.isActive) aLine.show();
+          else aLine.hide();
+        });
+        // if (this.previousLine) this.previousLine.hide();
+        // aLine.position();
+        // if (this.$refs[startId][0].isActive) aLine.show();
+        // else aLine.hide();
+        // this.previousLine = aLine;
+      }, 300);
     }
   }
 };
