@@ -17,16 +17,37 @@ def format_raw(raw):
     return output
 
 def get_value(a_string):
-    """
-    get value
-    ex)
-    (int *) ap = 0x00007ffee4ded554
-        -> 0x00007ffee4ded554
+    """Format and get the character string obtained by SBValue.GetValue()
+    
+    >>> get_value("(int *) ap = 0x00007ffee4ded554")
+    0x00007ffee4ded554
     """
     return a_string.split(' = ', 1)[1]
 
 def list_to_pattern(a_list):
-    return r'|'.join(a_list)
+    """Returns a pattern object that connects the list with OR
+
+    Args:
+        a_list (list): Word list
+
+    Returns:
+        str: Regular expressions
+    >>> a_list = ['hoge\n', 'foo']
+    >>> print('|'.join(a_list))
+    hoge
+    |foo
+    >>> print(list_to_pattern(a_list))
+    'hoge\n|foo'
+    """
+    return repr('|'.join(a_list))
 
 def symbol_type_to_str(type_num):
+    """Parses LLDB symbols and converts them to strings
+
+    Args:
+        type_num (int): number of type (LLDB's token)
+
+    Returns:
+        str: Symbol name
+    """
     return constants.TYPE_SYMBOLS[type_num]
