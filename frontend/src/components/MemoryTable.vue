@@ -83,7 +83,6 @@ v-container
 </template>
 
 <script>
-// import * as R from 'ramda';
 
 export default {
   name: 'App',
