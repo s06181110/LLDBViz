@@ -7,7 +7,7 @@ Flask Test
 
 from flask import Flask, request, jsonify
 from lldb_object import LLDBObject
-
+import constants
 app = Flask(__name__)
 
 LLDB = LLDBObject()
@@ -43,6 +43,9 @@ def set_breakpoint():
 def debug_process(process):
     """ debugger process """
     LLDB.debug_process(process)
+    if process == constants.STOP:
+        return 'stop'
+
     static = LLDB.get_static_memory()
     memory = LLDB.get_stack_memory()
     register = LLDB.get_register()
