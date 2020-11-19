@@ -6,10 +6,15 @@
 import constants
 
 def format_raw(raw):
-    """
-    format memory raw string
-    ex)
-    c8010000 -> 000001c8
+    """Format memory raw string
+
+    Args:
+        raw (str): raw memory
+
+    Returns:
+        str: formatted string
+    >>> format_row(c8010000)
+    000001c8
     """
     output = ''
     for byte in range(0, len(raw), 2):
@@ -18,7 +23,7 @@ def format_raw(raw):
 
 def get_value(a_string):
     """Format and get the character string obtained by SBValue.GetValue()
-    
+
     >>> get_value("(int *) ap = 0x00007ffee4ded554")
     0x00007ffee4ded554
     """
