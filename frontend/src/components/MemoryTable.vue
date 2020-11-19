@@ -175,11 +175,6 @@ export default {
           if (aComponent.isActive) aLine.show();
           else aLine.hide();
         });
-        // if (this.previousLine) this.previousLine.hide();
-        // aLine.position();
-        // if (this.$refs[startId][0].isActive) aLine.show();
-        // else aLine.hide();
-        // this.previousLine = aLine;
       }, 300);
     }
   }
