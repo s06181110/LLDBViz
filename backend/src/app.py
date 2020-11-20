@@ -23,7 +23,7 @@ def launch_lldb():
     LLDB.launch()
     static = LLDB.get_static_memory()
     memory = LLDB.get_stack_memory()
-    register = LLDB.get_register()
+    register = LLDB.get_pointers()
 
     response = dict(
         memory = memory,
@@ -48,7 +48,7 @@ def debug_process(process):
 
     static = LLDB.get_static_memory()
     memory = LLDB.get_stack_memory()
-    register = LLDB.get_register()
+    register = LLDB.get_pointers()
 
     response = dict(
         memory = memory,

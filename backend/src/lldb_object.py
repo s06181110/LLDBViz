@@ -106,10 +106,16 @@ class LLDBObject:
             self.update_frame()
             frame = self._frame
         return dict(
-            pc = hex(frame.GetPC()),
-            sp = hex(frame.GetSP()),
-            fp = hex(frame.GetFP())
+            pc = '0x{:0=16x}'.format(frame.GetPC()),
+            sp = '0x{:0=16x}'.format(frame.GetSP()),
+            fp = '0x{:0=16x}'.format(frame.GetFP())
         )
+    
+    def get_pointers(self):
+        pointers = []
+        for frame in self._thread.get_thread_frames(): # Exclude before the main method
+            pointers.append(self.get_register(frame))
+        return pointers
 
     def get_static_memory(self):
         if self._process is None:
@@ -153,20 +159,18 @@ class LLDBObject:
             return 'None'
         self.update_thread()
         all_stack = []
-        pointers = []
-        for index in range(self._thread.GetNumFrames() - 1): # Exclude before the main method
-            frame = self._thread.GetFrameAtIndex(index)
+        for frame in self._thread.get_thread_frames():
             function_name = frame.GetFunctionName()
-            pointers.append(self.get_register(frame))
             for variable in frame.GetVariables(True, True, False, False):
                 stack_info = StackInformation()
                 stack_info.set_variable_info(function_name, variable, self.read_memory())
                 all_stack.append(stack_info.as_dict())
-        all_stack = self._fill_with_padding(all_stack, pointers)
+        all_stack = self._fill_with_padding(all_stack)
         return all_stack
 
-    def _fill_with_padding(self, stack, pointers):
+    def _fill_with_padding(self, stack):
         sorted_stack = sorted(stack, key=lambda x:x['address'])
+        pointers = self.get_pointers()
         pc_list = list_to_pattern([pointer.get('pc')[2:] for pointer in pointers])
         fp_list = list_to_pattern([pointer.get('fp')[2:] for pointer in pointers])
         next_address = ''
