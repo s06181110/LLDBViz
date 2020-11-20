@@ -74,13 +74,14 @@ v-container
                 v-row.justify-center
                   v-btn.mr-8.red( dark @click="launchLLDB" ) launch
                   v-btn.mr-8.primary( dark @click="stopLLDB" ) stop
-        v-col.col-12(v-if="status === 'launch'" )
-          v-card.mt-10
+        v-col.col-12
+          v-card.mt-10#register
             v-card-title Register
-            v-card-text
-              p SP: {{ register.sp }}
-              p FP: {{ register.fp }}
-              p PC: {{ register.pc }}
+            v-card-text.ml-8.subtitle-1.text--primary
+              pre
+                p SP: {{ register.sp }}
+                p FP: {{ register.fp }}
+                p PC: {{ register.pc }}
 </template>
 
 <script>
