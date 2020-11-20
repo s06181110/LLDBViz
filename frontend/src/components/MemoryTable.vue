@@ -55,6 +55,9 @@ v-container
                   v-col.col-3
                     v-btn( @click="doProcess('STEP_OUT')" icon small )
                       v-icon mdi-debug-step-out
+                  v-col.col-12
+                   v-overlay(absolute :value="overlay" )
+                     v-btn.success( @click="flowOfProcess()" ) next
         v-col.col-12
           v-card.mt-10
             v-card-title Debugger
@@ -97,12 +100,15 @@ export default {
     },
     breakpointLines: [25],
     status: 'stop',
-    previous: [],
+    previousData: {},
     stack: [],
+    responseStore: {},
     register: {},
     static: {},
-    lines: {},
-    previousLine: null
+    lines: { register: null },
+    previousLine: null,
+    overlay: false,
+    dataSizeDiff: 0,
   }),
   methods: {
     initialize () {
@@ -117,12 +123,53 @@ export default {
       this.previousLine = null;
     },
     doProcess (type) {
-      this.previous = this.stack;
+      this.previousData = {
+        memory: this.stack,
+        register: this.register,
+        static: this.static
+      };
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.stack = res.data.memory;
-        this.register = res.data.register;
         this.static = res.data.static;
+        this.dataSizeDiff = res.data.memory.length - this.stack.length;
+        if (this.dataSizeDiff !== 0) {
+          this.overlay = true;
+          this.parseResponse(res.data);
+          this.responseStore = res.data;
+          this.flowOfProcess();
+        } else {
+          this.stack = res.data.memory;
+          this.register = res.data.register[0];
+        }
       }).catch(e => console.error(e));
+    },
+    flowOfProcess () {
+      if (this.lines.register) {
+        this.lines.register.remove();
+        this.lines.register = null;
+        this.register = this.responseStore.register[0];
+      }
+      if (Math.sign(this.dataSizeDiff) === 1) { // positive
+        const pushData = this.responseStore.memory[this.dataSizeDiff - 1];
+        this.stack.unshift(pushData);
+        this.dataSizeDiff -= 1;
+      } else if (Math.sign(this.dataSizeDiff) === -1) { // negative
+        this.stack.shift();
+        this.dataSizeDiff += 1;
+      }
+      if (this.stack[0].name === "return infomation") {
+        setTimeout(() => {
+          const returnElement = document.getElementById(this.stack[0].address);
+          const registerElement = document.getElementById('register');
+          if (Math.sign(this.dataSizeDiff) === 1) this.lines['register'] = LeaderLine.setLine(registerElement, returnElement, { path: 'grid', startSocket: 'left', endSocket: 'right', });
+          else this.lines['register'] = LeaderLine.setLine(returnElement, registerElement, { path: 'grid', startSocket: 'right', endSocket: 'left', });
+          this.register = this.responseStore.register[1];
+        }, 100);
+      }
+      if (this.dataSizeDiff === 0) {
+        this.overlay = false;
+        this.stack = this.responseStore.memory;
+        this.static = this.responseStore.static;
+      }
     },
     setBreakpoints () {
       this.$axios.post('/api/breakpoints', this.breakpointLines)
@@ -136,7 +183,7 @@ export default {
         if (res.status === 200) {
           this.status = 'launch';
           this.stack = res.data.memory;
-          this.register = res.data.register;
+          this.register = res.data.register[0];
           this.static = res.data.static;
         }
       });
