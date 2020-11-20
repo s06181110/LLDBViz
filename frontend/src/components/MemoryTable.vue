@@ -84,6 +84,7 @@ v-container
 </template>
 
 <script>
+import * as R from 'ramda';
 import LeaderLine from 'leader-line-vue';
 
 export default {
