@@ -104,6 +104,17 @@ export default {
     previousLine: null
   }),
   methods: {
+    initialize () {
+      this.breakpoints = { show: true, text: '' };
+      this.breakpointLines = [25];
+      this.status = 'stop';
+      this.previous = [];
+      this.stack = [];
+      this.register = {};
+      this.static = {};
+      this.lines = {};
+      this.previousLine = null;
+    },
     doProcess (type) {
       this.previous = this.stack;
       this.$axios.get(`/api/process/${type}`).then(res => {
@@ -132,7 +143,7 @@ export default {
     stopLLDB () {
       this.$axios.get('/api/process/STOP').then(res => {
         if (res.status === 200) {
-          this.status = 'stop';
+          this.initialize();
         }
       });
     },
