@@ -19,7 +19,7 @@ v-container
                     p raw  : {{ item.raw }}
           v-col.col-5
             v-card-title Memory Region
-            v-expansion-panels( multiple focusable accordion )
+            v-expansion-panels( multiple focusable accordion :value="activePanels" )
               v-expansion-panel.white(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update(item.address)")
                 v-expansion-panel-header(:id="item.address" :ref="item.address")
                   | {{ item.address}}
@@ -33,7 +33,13 @@ v-container
                     p ref   : 
                       a(@click="" ) *{{ item.name }}
                       //- a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
-                  p data  : {{ item.data }}
+                  template(v-if="item.name === 'return infomation'")
+                    div(:id="item.address + '-wrap'")
+                      p data  : {
+                      p(:id="item.address + '-fp'")  FP : {{ item.data.fp }}
+                      p(:id="item.address + '-pc'")  PC : {{ item.data.pc }}
+                      p }
+                  p(v-else) data  : {{ item.data }}
                   p raw   : {{ item.raw }}
     v-col.col-4
       v-row(no-gutters)
@@ -81,10 +87,11 @@ v-container
           v-card.mt-10#register
             v-card-title Register
             v-card-text.ml-8.subtitle-1.text--primary
-              pre
-                p SP: {{ register.sp }}
-                p FP: {{ register.fp }}
-                p PC: {{ register.pc }}
+              pre(style="width: 50%")
+                p#sp.pl-2 SP: {{ register.sp }}
+                div(id="register-wrap")
+                  p#fp.pl-2 FP: {{ register.fp }}
+                  p#pc.pl-2 PC: {{ register.pc }}
 </template>
 
 <script>
@@ -102,13 +109,14 @@ export default {
     status: 'stop',
     previousData: {},
     stack: [],
+    activePanels: [],
     responseStore: {},
     register: {},
     static: {},
     lines: { register: null },
     previousLine: null,
     overlay: false,
-    dataSizeDiff: 0,
+    dataSizeDiff: 0
   }),
   methods: {
     initialize () {
@@ -143,25 +151,33 @@ export default {
       }).catch(e => console.error(e));
     },
     flowOfProcess () {
+      const diffType = Math.sign(this.dataSizeDiff);
       if (this.lines.register) {
         this.lines.register.remove();
         this.lines.register = null;
         this.register = this.responseStore.register[0];
+        this.activePanels = [];
       }
-      if (Math.sign(this.dataSizeDiff) === 1) { // positive
+      /* -- stack: push or pop --*/
+      if (diffType === 1) { // positive
         const pushData = this.responseStore.memory[this.dataSizeDiff - 1];
         this.stack.unshift(pushData);
         this.dataSizeDiff -= 1;
-      } else if (Math.sign(this.dataSizeDiff) === -1) { // negative
+      } else if (diffType === -1) { // negative
         this.stack.shift();
         this.dataSizeDiff += 1;
       }
+      /* ------------------ */
       if (this.stack[0].name === "return infomation") {
-        setTimeout(() => {
-          const returnElement = document.getElementById(this.stack[0].address);
-          const registerElement = document.getElementById('register');
-          if (Math.sign(this.dataSizeDiff) === 1) this.lines['register'] = LeaderLine.setLine(registerElement, returnElement, { path: 'grid', startSocket: 'left', endSocket: 'right', });
-          else this.lines['register'] = LeaderLine.setLine(returnElement, registerElement, { path: 'grid', startSocket: 'right', endSocket: 'left', });
+        this.activePanels.push(this.stack.length-1); // open panel of new stack
+        setTimeout(() => { // wait rendering
+          const data = { element: document.getElementById(this.stack[0].address + '-wrap'), socket: 'right' };
+          const register = { element: document.getElementById('register-wrap'), socket: 'left' };
+          const startLine = diffType === 1 ? register : data;
+          const endLine = diffType === 1 ? data : register;
+          const options = { path: 'grid', startSocket: startLine.socket, endSocket: endLine.socket, hide: true, dash: { animation: true }};
+          this.lines.register = LeaderLine.setLine(LeaderLine.obj.areaAnchor(startLine.element), LeaderLine.obj.areaAnchor(endLine.element), options);
+          this.lines.register.show('draw'); // use animation
           this.register = this.responseStore.register[1];
         }, 100);
       }
@@ -244,5 +260,8 @@ export default {
 <style>
 .stack-data {
   white-space: pre-wrap;
+}
+.leader-line, .leader-line-areaAnchor {
+  z-index: 1;
 }
 </style>
