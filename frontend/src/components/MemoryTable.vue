@@ -8,7 +8,7 @@ v-container
           v-col.col-5
             v-card-title Static Region
             v-expansion-panels( multiple focusable accordion )
-              v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'" @click="update()")
+              v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'" @click="update()" :class="item.isChanged ? 'yellow lighten-5' : 'white'")
                 v-expansion-panel-header(:id="item.address")
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
@@ -20,7 +20,7 @@ v-container
           v-col.col-5
             v-card-title Memory Region
             v-expansion-panels( multiple focusable accordion :value="activePanels" )
-              v-expansion-panel.white(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update(item.address)")
+              v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update()" :class="item.isChanged ? 'yellow lighten-5' : 'white'" )
                 v-expansion-panel-header(:id="item.address" :ref="item.address")
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
@@ -73,7 +73,7 @@ v-container
                   v-col.col-12
                     p.text--primary status: {{ status }}
                   v-col.col-6
-                    v-select( v-model="breakpointLines" :items="[11,13,25]" label="breakpoint"  multiple dense )
+                    v-select( v-model="breakpointLines" :items="[11,13,17,25]" label="breakpoint"  multiple dense )
                   v-col( style="text-align: center;" )
                     v-btn.primary( @click="setBreakpoints" ) set
                   v-col.col-12
@@ -88,10 +88,10 @@ v-container
             v-card-title Register
             v-card-text.ml-8.subtitle-1.text--primary
               pre(style="width: 50%")
-                p#sp.pl-2 SP: {{ register.sp }}
+                p#sp.pl-2(:class="previousData && register.sp !== previousData.register.sp ? 'red--text' : false") SP: {{ register.sp }}
                 div(id="register-wrap")
-                  p#fp.pl-2 FP: {{ register.fp }}
-                  p#pc.pl-2 PC: {{ register.pc }}
+                  p#fp.pl-2(:class="previousData && register.fp !== previousData.register.fp ? 'red--text' : false") FP: {{ register.fp }}
+                  p#pc.pl-2(:class="previousData && register.pc !== previousData.register.pc ? 'red--text' : false") PC: {{ register.pc }}
 </template>
 
 <script>
@@ -107,7 +107,7 @@ export default {
     },
     breakpointLines: [25],
     status: 'stop',
-    previousData: {},
+    previousData: '',
     stack: [],
     activePanels: [],
     responseStore: {},
@@ -137,11 +137,11 @@ export default {
         static: this.static
       };
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.static = res.data.static;
         this.dataSizeDiff = res.data.memory.length - this.stack.length;
+        this.parseResponse(res.data);
+        this.static = res.data.static;
         if (this.dataSizeDiff !== 0) {
           this.overlay = true;
-          this.parseResponse(res.data);
           this.responseStore = res.data;
           this.flowOfProcess();
         } else {
@@ -149,6 +149,15 @@ export default {
           this.register = res.data.register[0];
         }
       }).catch(e => console.error(e));
+    },
+    parseResponse (res) {
+      const addIsChangedProps = attr => obj => {
+        const previous = R.find(R.propEq('address', obj.address))(this.previousData[attr]);
+        obj.isChanged = !previous || !R.eqProps('raw', obj, previous); 
+      };
+      R.forEach(addIsChangedProps('memory'), res.memory);
+      R.forEach(addIsChangedProps('static'), res.static);
+      if (this.dataSizeDiff > 0) this.stack = res.memory.slice(this.dataSizeDiff);
     },
     flowOfProcess () {
       const diffType = Math.sign(this.dataSizeDiff);
@@ -240,9 +249,7 @@ export default {
     preferredId (id) {
       return id.length !== 18 ? id.slice(0, 18) : id;
     },
-    update(address) {
-      const aLine = this.lines[address];
-      if (!aLine) return;
+    update() {
       setTimeout(() => {
         Object.keys(this.lines).forEach(key => {
           const aComponent = this.$refs[key][0];
