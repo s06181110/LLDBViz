@@ -46,6 +46,9 @@ def list_to_pattern(a_list):
     """
     return repr('|'.join(a_list))
 
+def dictionaries_to_list_by_prop(dictionaries, prop):
+    return  [a_dict.get(prop) for a_dict in dictionaries]
+
 def symbol_type_to_str(type_num):
     """Parses LLDB symbols and converts them to strings
 

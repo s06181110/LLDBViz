@@ -5,8 +5,13 @@
 Constants file
 """
 
+import os
 # pylint: disable=E0401
 import lldb
+
+# assembler output
+EXE = os.path.join(os.getcwd(), 'target', 'a.out')
+ERROR = lldb.SBError()
 
 # process
 STEP_INTO = 'STEP_INTO'
@@ -14,6 +19,7 @@ STEP_OVER = 'STEP_OVER'
 STEP_OUT  = 'STEP_OUT'
 CONTINUE  = 'CONTINUE'
 STOP      = 'STOP'
+# LLDB symbols
 TYPE_SYMBOLS = {
         lldb.eSymbolTypeAbsolute: 'Absolute',
         lldb.eSymbolTypeAdditional: 'Additional',

@@ -11,7 +11,7 @@ __date__ = '2020/11/6 (Created: 2020/11/6)'
 
 from utility import format_raw, get_value
 
-class StackInformation:
+class MemoryCell:
     """
     Memory Stack Infomation Class
     """
