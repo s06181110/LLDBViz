@@ -7,10 +7,13 @@ Flask Test
 
 from flask import Flask, request, jsonify
 from lldb_object import LLDBObject
+from memory_structure import MemoryStructure
+from pprint import pprint
 import constants
 app = Flask(__name__)
 
 LLDB = LLDBObject()
+memory = MemoryStructure(LLDB)
 
 @app.route('/')
 def hello_world():
@@ -20,17 +23,9 @@ def hello_world():
 @app.route('/launch')
 def launch_lldb():
     """ create lldb """
-    LLDB.launch()
-    static = LLDB.get_static_memory()
-    memory = LLDB.get_stack_memory()
-    register = LLDB.get_pointers()
-
-    response = dict(
-        memory = memory,
-        static = static,
-        register = register
-    )
-    return jsonify(response)
+    memory.lldb = LLDB.launch()
+    memory.update()
+    return jsonify(memory.as_dict())
 
 @app.route('/breakpoints', methods=['POST'])
 def set_breakpoint():
@@ -43,19 +38,9 @@ def set_breakpoint():
 def debug_process(process):
     """ debugger process """
     LLDB.debug_process(process)
-    if process == constants.STOP:
-        return 'stop'
-
-    static = LLDB.get_static_memory()
-    memory = LLDB.get_stack_memory()
-    register = LLDB.get_pointers()
-
-    response = dict(
-        memory = memory,
-        static = static,
-        register = register
-    )
-    return jsonify(response)
+    if LLDB.is_active():
+        memory.update()
+    return jsonify(memory.as_dict())
 
 def test():
     """
@@ -68,16 +53,9 @@ def test():
     print(debug_process('STEP_INTO'))
     print(debug_process('STOP'))
     """
-    from pprint import pprint
-    LLDB.set_breakpoint([18])
-    LLDB.launch()
-    LLDB.debug_process('STEP_INTO')
-    LLDB.get_stack_memory()
-
-    # LLDB.debug_process('STEP_INTO')
-    # LLDB.debug_process('STEP_INTO')
-    # LLDB.get_address()
-    # print(LLDB.get_variables())
+    LLDB.set_breakpoint([27])
+    launch_lldb()
+    debug_process('STEP_INTO')
 
 if __name__ == "__main__":
     test()

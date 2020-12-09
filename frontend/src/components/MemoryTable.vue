@@ -132,12 +132,12 @@ export default {
     },
     doProcess (type) {
       this.previousData = {
-        memory: this.stack,
+        stack: this.stack,
         register: this.register,
         static: this.static
       };
       this.$axios.get(`/api/process/${type}`).then(res => {
-        this.dataSizeDiff = res.data.memory.length - this.stack.length;
+        this.dataSizeDiff = res.data.stack.length - this.stack.length;
         this.parseResponse(res.data);
         this.static = res.data.static;
         if (this.dataSizeDiff !== 0) {
@@ -145,7 +145,7 @@ export default {
           this.responseStore = res.data;
           this.flowOfProcess();
         } else {
-          this.stack = res.data.memory;
+          this.stack = res.data.stack;
           this.register = res.data.register[0];
         }
       }).catch(e => console.error(e));
@@ -155,9 +155,9 @@ export default {
         const previous = R.find(R.propEq('address', obj.address))(this.previousData[attr]);
         obj.isChanged = !previous || !R.eqProps('raw', obj, previous); 
       };
-      R.forEach(addIsChangedProps('memory'), res.memory);
+      R.forEach(addIsChangedProps('stack'), res.stack);
       R.forEach(addIsChangedProps('static'), res.static);
-      if (this.dataSizeDiff > 0) this.stack = res.memory.slice(this.dataSizeDiff);
+      if (this.dataSizeDiff > 0) this.stack = res.stack.slice(this.dataSizeDiff);
     },
     flowOfProcess () {
       const diffType = Math.sign(this.dataSizeDiff);
@@ -169,7 +169,7 @@ export default {
       }
       /* -- stack: push or pop --*/
       if (diffType === 1) { // positive
-        const pushData = this.responseStore.memory[this.dataSizeDiff - 1];
+        const pushData = this.responseStore.stack[this.dataSizeDiff - 1];
         this.stack.unshift(pushData);
         this.dataSizeDiff -= 1;
       } else if (diffType === -1) { // negative
@@ -192,7 +192,7 @@ export default {
       }
       if (this.dataSizeDiff === 0) {
         this.overlay = false;
-        this.stack = this.responseStore.memory;
+        this.stack = this.responseStore.stack;
         this.static = this.responseStore.static;
       }
     },
@@ -207,7 +207,7 @@ export default {
       this.$axios.get('/api/launch').then(res => {
         if (res.status === 200) {
           this.status = 'launch';
-          this.stack = res.data.memory;
+          this.stack = res.data.stack;
           this.register = res.data.register[0];
           this.static = res.data.static;
         }
