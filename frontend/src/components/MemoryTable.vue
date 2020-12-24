@@ -3,10 +3,10 @@ v-container
   v-row
     v-col.col-8
       v-card.col-12.pb-10#memory
-        v-card-title Memory
+        v-card-title メモリ
         v-row.justify-space-around(no-gutters)
           v-col.col-5
-            v-card-title Static Region
+            v-card-title テキスト領域 + データ領域
             v-expansion-panels( multiple focusable accordion )
               v-expansion-panel(v-for="item in static" :key="item.address" :disabled="item.name == 'Unanalyzed'" @click="update()" :class="item.isChanged ? 'yellow lighten-5' : 'white'")
                 v-expansion-panel-header(:id="item.address")
@@ -18,7 +18,7 @@ v-container
                     p( v-text="`type : ${ item.type }`" )
                     p raw  : {{ item.raw }}
           v-col.col-5
-            v-card-title Memory Region
+            v-card-title スタック領域
             v-expansion-panels( multiple focusable accordion :value="activePanels" )
               v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update()" :class="item.isChanged ? 'yellow lighten-5' : 'white'" )
                 v-expansion-panel-header(:id="item.address" :ref="item.address")
@@ -45,35 +45,47 @@ v-container
       v-row(no-gutters)
         v-col.col-12
           v-card
-            v-card-title Process
+            v-card-title プロセス
             v-card-text
               v-container
                 v-row.text-center
-                  v-col.col-3(ref="test")
-                    v-btn( @click="doProcess('CONTINUE')" icon small )
-                      v-icon mdi-step-forward
                   v-col.col-3
-                    v-btn( @click="doProcess('STEP_OVER')" icon small )
-                      v-icon mdi-debug-step-over 
+                    v-tooltip( bottom )
+                      template( v-slot:activator="{ on, attrs }" )
+                        v-btn(icon small v-bind="attrs" v-on="on" @click="doProcess('CONTINUE')")
+                          v-icon mdi-step-forward
+                      span Continue
                   v-col.col-3
-                    v-btn( @click="doProcess('STEP_INTO')" icon small )
-                      v-icon mdi-debug-step-into
+                    v-tooltip( bottom )
+                      template( v-slot:activator="{ on, attrs }" )
+                        v-btn( @click="doProcess('STEP_OVER')" icon small v-bind="attrs" v-on="on" )
+                          v-icon mdi-debug-step-over 
+                      span Step Over
                   v-col.col-3
-                    v-btn( @click="doProcess('STEP_OUT')" icon small )
-                      v-icon mdi-debug-step-out
+                    v-tooltip( bottom )
+                      template( v-slot:activator="{ on, attrs }" )
+                        v-btn( @click="doProcess('STEP_INTO')" icon small v-bind="attrs" v-on="on" )
+                          v-icon mdi-debug-step-into
+                      span Step Into
+                  v-col.col-3
+                    v-tooltip( bottom )
+                      template( v-slot:activator="{ on, attrs }" )
+                        v-btn( @click="doProcess('STEP_OUT')" icon small v-bind="attrs" v-on="on" )
+                          v-icon mdi-debug-step-out
+                      span Step Out
                   v-col.col-12
                    v-overlay(absolute :value="overlay" )
                      v-btn.success( @click="flowOfProcess()" ) next
         v-col.col-12
           v-card.mt-10
-            v-card-title Debugger
+            v-card-title デバッガ
             v-card-text
               v-container.align-center
                 v-row
                   v-col.col-12
                     p.text--primary status: {{ status }}
                   v-col.col-6
-                    v-select( v-model="breakpointLines" :items="[11,13,17,25]" label="breakpoint"  multiple dense )
+                    v-select( v-model="breakpointLines" :items="[11,13,20,25]" label="breakpoint"  multiple dense )
                   v-col( style="text-align: center;" )
                     v-btn.primary( @click="setBreakpoints" ) set
                   v-col.col-12
@@ -85,7 +97,7 @@ v-container
                   v-btn.mr-8.primary( dark @click="stopLLDB" ) stop
         v-col.col-12
           v-card.mt-10#register
-            v-card-title Register
+            v-card-title レジスタ
             v-card-text.ml-8.subtitle-1.text--primary
               pre(style="width: 50%")
                 p#sp.pl-2(:class="previousData && register.sp !== previousData.register.sp ? 'red--text' : false") SP: {{ register.sp }}
@@ -105,7 +117,7 @@ export default {
       show: true,
       text: '',
     },
-    breakpointLines: [25],
+    breakpointLines: [13],
     status: 'stop',
     previousData: '',
     stack: [],
@@ -121,7 +133,7 @@ export default {
   methods: {
     initialize () {
       this.breakpoints = { show: true, text: '' };
-      this.breakpointLines = [25];
+      this.breakpointLines = [20];
       this.status = 'stop';
       this.previous = [];
       this.stack = [];
@@ -243,8 +255,9 @@ export default {
         endSocket: 'right',
         hide: true
       };
-      const aLine = LeaderLine.setLine(startComponent.$el, endElement, options);
-      this.lines[startId] = aLine;
+      this.lines[startId] = LeaderLine.setLine(startComponent.$el, endElement, options);
+      // const aLine = LeaderLine.setLine(startComponent.$el, endElement, options);
+      // this.lines[startId] = aLine;
     },
     preferredId (id) {
       return id.length !== 18 ? id.slice(0, 18) : id;

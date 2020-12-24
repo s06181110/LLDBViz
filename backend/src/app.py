@@ -40,7 +40,8 @@ def debug_process(process):
     LLDB.debug_process(process)
     if LLDB.is_active():
         memory.update()
-    return jsonify(memory.as_dict())
+        return jsonify(memory.as_dict())
+    return 'stop'
 
 def test():
     """
