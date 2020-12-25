@@ -99,7 +99,7 @@ class MemoryStructure:
                 padding = MemoryCell()
                 return_information = self._search_return_information(current_address, next_address)
                 if return_information['value']:
-                    padding.set_padding_info(next_address, return_information['raw'], 'return infomation', return_information['value'])
+                    padding.set_padding_info(next_address, return_information['raw'], 'Return Address', return_information['value'])
                 else:
                     padding.set_padding_info(next_address, return_information['raw'])
                 all_stack.append(padding.as_dict())

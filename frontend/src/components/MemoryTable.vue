@@ -20,7 +20,7 @@ v-container
           v-col.col-5
             v-card-title スタック領域
             v-expansion-panels( multiple focusable accordion :value="activePanels" )
-              v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update()" :class="item.isChanged ? 'yellow lighten-5' : 'white'" )
+              v-expansion-panel(v-for="item in stack" :key="item.address" :disabled="item.name == 'padding'" @click="update(item.address)" :class="item.isChanged ? 'yellow lighten-5' : 'white'" )
                 v-expansion-panel-header(:id="item.address" :ref="item.address")
                   | {{ item.address}}
                   v-divider.mx-4( vertical style="color: black")
@@ -31,9 +31,9 @@ v-container
                   p( v-text="`type  : ${ item.type }`" )
                   template(v-if="isPointer(item)" )
                     p ref   : 
-                      a(@click="" ) *{{ item.name }}
+                      a(@click="addLeaderLine(item)" ) *{{ item.name }}
                       //- a(:href="`#${item.data.split('(')[0]}`") *{{ item.name }}
-                  template(v-if="item.name === 'return infomation'")
+                  template(v-if="item.name === 'Return Address'")
                     div(:id="item.address + '-wrap'")
                       p data  : {
                       p(:id="item.address + '-fp'")  FP : {{ item.data.fp }}
@@ -189,7 +189,7 @@ export default {
         this.dataSizeDiff += 1;
       }
       /* ------------------ */
-      if (this.stack[0].name === "return infomation") {
+      if (this.stack[0].name === "Return Address") {
         this.activePanels.push(this.stack.length-1); // open panel of new stack
         setTimeout(() => { // wait rendering
           const data = { element: document.getElementById(this.stack[0].address + '-wrap'), socket: 'right' };
@@ -240,38 +240,61 @@ export default {
     },
     isPointer (item) {
       if (!item.type.includes('*')) return false;
-      setTimeout(function() {
-        this.addLeaderLine(item.address, item.data);
-      }.bind(this), 500);
       return true;
     },
-    addLeaderLine(startId, endId) {
-      const startComponent = this.$refs[startId] ? this.$refs[startId][0] : null;
-      const endElement = document.getElementById(this.preferredId(endId));
-      if (!startComponent || !endElement ) return;
+    addLeaderLine(startCell) {
+      const startElement = document.getElementById(startCell.address);
+      const endElement = document.getElementById(this.preferredId(startCell.data));
+      if (!startElement || !endElement ) return;
       const options = {
         path: 'grid',
-        startSocket: endId.length !== 18 ? 'left' : 'right',
+        startSocket: startCell.data.length !== 18 ? 'left' : 'right',
         endSocket: 'right',
         hide: true
       };
-      this.lines[startId] = LeaderLine.setLine(startComponent.$el, endElement, options);
+      const aLine = LeaderLine.setLine(startElement, endElement, options);
+      aLine.show(); // animation
+      this.lines[startCell.address] = aLine;
+
+      // const startComponent = this.$refs[startId] ? this.$refs[startId][0] : null;
+      // const endElement = document.getElementById(this.preferredId(endId));
+      // if (!startComponent || !endElement ) return;
+      // const options = {
+      //   path: 'grid',
+      //   startSocket: endId.length !== 18 ? 'left' : 'right',
+      //   endSocket: 'right',
+      //   hide: true
+      // };
+      // this.lines[startId] = LeaderLine.setLine(startComponent.$el, endElement, options);
       // const aLine = LeaderLine.setLine(startComponent.$el, endElement, options);
       // this.lines[startId] = aLine;
     },
     preferredId (id) {
       return id.length !== 18 ? id.slice(0, 18) : id;
     },
-    update() {
+    update(address) {
+      const aLine = this.lines[address];
+      if (aLine) {
+        console.log(aLine);
+        aLine.remove();
+        delete this.lines[address];
+      }
       setTimeout(() => {
         Object.keys(this.lines).forEach(key => {
-          const aComponent = this.$refs[key][0];
-          const aLine = this.lines[key];
-          aLine.position();
-          if (aComponent.isActive) aLine.show();
-          else aLine.hide();
+          this.lines[key].position();
         });
-      }, 300);
+      }, 500);
+      // setTimeout(() => {
+      //   Object.keys(this.lines).forEach(key => {
+      //     const aComponent = this.$refs[key][0];
+      //     const aLine = this.lines[key];
+      //     aLine.position();
+      //     if (!aComponent.isActive) {
+      //       aLine.remove();
+      //       delete this.lines[key];
+      //     }
+      //   });
+      // }, 500);
     }
   }
 };
